@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es" data-tema-pref="sistema">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sistemas y Tableros · Plásticos Carmen</title>
+<meta name="description" content="Punto de acceso a los sistemas y tableros del Departamento de IT de Plásticos Carmen S.R.L.">
+
+<!-- El tema se resuelve ANTES de pintar para que no haya parpadeo blanco. -->
+<script>
+(function () {
+  var raiz = document.documentElement, pref = 'sistema';
+  try { pref = localStorage.getItem('pc-tema') || 'sistema'; } catch (e) {}
+  raiz.dataset.temaPref = pref;
+  var oscuro = pref === 'oscuro' ||
+    (pref === 'sistema' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  raiz.dataset.tema = oscuro ? 'oscuro' : 'claro';
+})();
+</script>
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="theme-color" content="#063381">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Mismas hojas que el Portafolio de Reportes BI: marca.css (paleta), base.css,
+     menu.css (tarjetas) y tema.css al final, que ajusta todo a la v2. -->
+<link rel="stylesheet" href="css/marca.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/tema.css">
+<link rel="stylesheet" href="css/sitio.css">
+</head>
+<body class="pagina-menu">
+
+<header class="barra-sup">
+  <a class="marca" href="./" aria-label="Ir al inicio">
+    <img class="logo-marca" src="img/logo-pc.png" width="46" height="34" alt="Plásticos Carmen">
+    <div class="nombre">Plásticos<br>Carmen</div>
+  </a>
+  <div class="divisor"></div>
+  <div class="titulo">
+    <h1>Sistemas y Tableros</h1>
+    <p>Accesos a los sistemas del Departamento de IT de Plásticos Carmen</p>
+  </div>
+  <div class="sesion">
+    <button type="button" class="btn btn--fantasma btn--icono btn-tema" id="btnTema"
+            title="Apariencia" aria-label="Cambiar apariencia">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono icono-sol"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono icono-luna"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+      <span class="punto-sistema" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<main class="contenido contenido--ancha menu">
+
+  <section class="portada">
+    <div class="portada-texto">
+      <p class="portada-fecha" id="fecha"></p>
+      <h2 id="saludo">Bienvenido</h2>
+      <p class="portada-bajada">Este es el punto de partida público: entra al tablero de Control de Asistencia,
+        al portafolio de iniciativas o a los sitios de la empresa. Los sistemas con datos internos piden
+        su propio acceso.</p>
+    </div>
+    <div class="portada-cifras" role="list">
+      <a role="listitem" class="cifra" href="#tableros"><b>1</b><span>tablero</span></a>
+      <a role="listitem" class="cifra" href="#accesos"><b id="nAccesos">0</b><span>accesos</span></a>
+      <a role="listitem" class="cifra" href="#tableros"><b>7</b><span>secciones de planta</span></a>
+    </div>
+  </section>
+
+  <div class="menu-grid">
+    <div class="menu-col">
+
+      <div class="buscador" role="search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="buscar-tarjetas" placeholder="Buscar un acceso o un tablero…" autocomplete="off" aria-label="Buscar en el menú">
+        <span class="buscador-atajo" aria-hidden="true">/</span>
+      </div>
+      <p class="sin-resultados" id="sin-resultados" hidden>Nada coincide con la búsqueda.</p>
+
+      <section class="seccion" id="tableros">
+        <header class="seccion-cabecera">
+          <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/></svg> Tableros</h2>
+          <p>Tableros de gestión publicados por el Departamento de IT. Los datos se cargan y se procesan en tu propio navegador.</p>
+        </header>
+
+        <div class="rejilla rejilla--panel">
+          <article class="tarjeta tarjeta--tinta tarjeta--destacada" data-tarjeta
+                   data-buscar="control de asistencia tablero gestión rrhh gerencia planta atrasos faltas horas extra">
+            <a class="tarjeta-franja" href="asistencia/">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M14 4h6v6M20 4l-9 9M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>
+              Abrir el tablero de asistencia
+            </a>
+            <a class="tarjeta-vista" href="asistencia/" aria-label="Abrir el tablero de Control de Asistencia" tabindex="-1">
+              <div class="vista vista--svg" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img">
+<rect width="320" height="150" fill="#f4f6fa"/>
+<rect x="150" y="18" width="150" height="120" rx="10" fill="#fff" stroke="#e0e5ef"/><rect x="150" y="18" width="150" height="26" rx="10" fill="#063381"/><rect x="150" y="34" width="150" height="10" fill="#063381"/><rect x="162" y="54" width="16" height="16" rx="4" fill="#E00613"/><rect x="184" y="54" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M188 62 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="206" y="54" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M210 62 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="228" y="54" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M232 62 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="250" y="54" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M254 62 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="272" y="54" width="16" height="16" rx="4" fill="#E00613"/><rect x="162" y="80" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M166 88 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="184" y="80" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M188 88 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="206" y="80" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M210 88 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="228" y="80" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M232 88 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="250" y="80" width="16" height="16" rx="4" fill="#E00613"/><rect x="272" y="80" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M276 88 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="162" y="106" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M166 114 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="184" y="106" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M188 114 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="206" y="106" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M210 114 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="228" y="106" width="16" height="16" rx="4" fill="#E00613"/><rect x="250" y="106" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M254 114 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="272" y="106" width="16" height="16" rx="4" fill="#e8edf6"/><path d="M276 114 l3 3 5-6" stroke="#063381" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78" cy="78" r="50" fill="#fff" stroke="#063381" stroke-width="6"/><circle cx="78" cy="78" r="42" fill="none" stroke="#e8edf6" stroke-width="2"/><line x1="78" y1="78" x2="78" y2="46" stroke="#04205a" stroke-width="5" stroke-linecap="round"/><line x1="78" y1="78" x2="100" y2="90" stroke="#E00613" stroke-width="4" stroke-linecap="round"/><circle cx="78" cy="78" r="4" fill="#04205a"/>
+</svg></div>
+              <span class="tarjeta-etiqueta">v13</span>
+              <span class="tarjeta-brillo" aria-hidden="true"></span>
+            </a>
+            <div class="tarjeta-cuerpo">
+              <h3>Control de Asistencia · Tablero de Gestión</h3>
+              <p>Vistas de Gerencia, RRHH y Planta con KPIs de asistencia, puntualidad, permanencia, salida anticipada
+                y horas extra, filtrado cruzado en todos los gráficos y perfiles de jornada configurables.</p>
+              <small class="tarjeta-dominio"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> este sitio · /asistencia</small>
+            </div>
+            <div class="tarjeta-acciones">
+              <a class="btn btn--primario" href="asistencia/">Entrar <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="m9 6 6 6-6 6"/></svg></a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="seccion" id="accesos">
+        <header class="seccion-cabecera">
+          <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> Accesos</h2>
+          <p>Agrupados por tipo: lo que construye Sistemas y los sitios y servicios de la empresa.</p>
+        </header>
+
+        <details class="mosaico mosaico--propio" open data-mosaico="propio">
+          <summary>
+            <span class="mosaico-icono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></span>
+            <span class="mosaico-titulo">
+              <b>Sistemas propios</b>
+              <span>Desarrollados por el Departamento de IT</span>
+            </span>
+            <span class="mosaico-cuenta">2</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono mosaico-flecha"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="mosaico-rejilla">
+
+            <article class="tarjeta tarjeta--claro" data-tarjeta
+                     data-buscar="portafolio de transformación iniciativas actividades gantt cronograma">
+              <a class="tarjeta-vista" href="https://portafolio.plasticoscarmen.com" target="_blank" rel="noopener" aria-label="Abrir el Portafolio de Transformación" tabindex="-1">
+                <div class="vista vista--svg" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img">
+<rect width="320" height="150" fill="#f4f6fa"/>
+<rect x="22" y="14" width="276" height="150" rx="8" fill="#fff" stroke="#e0e5ef"/>
+<rect x="22" y="14" width="276" height="18" rx="8" fill="#063381"/><rect x="22" y="24" width="276" height="8" fill="#063381"/>
+<circle cx="33" cy="23" r="3" fill="#fff" opacity=".8"/><circle cx="43" cy="23" r="3" fill="#fff" opacity=".5"/><circle cx="53" cy="23" r="3" fill="#fff" opacity=".3"/><rect x="22" y="32" width="70" height="132" fill="#e8edf6"/><rect x="32" y="42" width="44" height="6" rx="3" fill="#93a6cb"/><rect x="32" y="60" width="52" height="6" rx="3" fill="#93a6cb"/><rect x="32" y="78" width="36" height="6" rx="3" fill="#93a6cb"/><rect x="32" y="96" width="48" height="6" rx="3" fill="#93a6cb"/><rect x="32" y="114" width="40" height="6" rx="3" fill="#93a6cb"/><rect x="102" y="42" width="190" height="1" fill="#e0e5ef"/><rect x="108" y="40" width="80" height="10" rx="5" fill="#063381"/><rect x="108" y="40" width="48" height="10" rx="5" fill="#fff" opacity=".28"/><rect x="102" y="60" width="190" height="1" fill="#e0e5ef"/><rect x="140" y="58" width="110" height="10" rx="5" fill="#2b56a6"/><rect x="140" y="58" width="66" height="10" rx="5" fill="#fff" opacity=".28"/><rect x="102" y="78" width="190" height="1" fill="#e0e5ef"/><rect x="120" y="76" width="60" height="10" rx="5" fill="#04205a"/><rect x="120" y="76" width="36" height="10" rx="5" fill="#fff" opacity=".28"/><rect x="102" y="96" width="190" height="1" fill="#e0e5ef"/><rect x="180" y="94" width="90" height="10" rx="5" fill="#E00613"/><rect x="180" y="94" width="54" height="10" rx="5" fill="#fff" opacity=".28"/><rect x="102" y="114" width="190" height="1" fill="#e0e5ef"/><rect x="100" y="112" width="150" height="10" rx="5" fill="#063381"/><rect x="100" y="112" width="90" height="10" rx="5" fill="#fff" opacity=".28"/><line x1="200" y1="34" x2="200" y2="164" stroke="#E00613" stroke-width="1.5" stroke-dasharray="3 3"/>
+</svg></div>
+                <span class="tarjeta-brillo" aria-hidden="true"></span>
+              </a>
+              <div class="tarjeta-cuerpo">
+                <h3>Portafolio de Transformación</h3>
+                <p>Seguimiento de iniciativas y actividades de la transformación, con cronograma y porcentajes de avance.</p>
+                <small class="tarjeta-dominio"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> portafolio.plasticoscarmen.com</small>
+              </div>
+              <div class="tarjeta-acciones">
+                <a class="btn btn--primario" href="https://portafolio.plasticoscarmen.com" target="_blank" rel="noopener">Ingresar <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="m9 6 6 6-6 6"/></svg></a>
+              </div>
+            </article>
+
+            <article class="tarjeta tarjeta--claro" data-tarjeta
+                     data-buscar="portafolio de reportes bi power bi tableros departamentos áreas">
+              <a class="tarjeta-vista" href="https://portafolio-reportes-bi.onrender.com" target="_blank" rel="noopener" aria-label="Abrir el Portafolio de Reportes BI" tabindex="-1">
+                <div class="vista vista--svg" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img">
+<rect width="320" height="150" fill="#f4f6fa"/>
+<rect x="20" y="16" width="120" height="60" rx="8" fill="#fff" stroke="#e0e5ef"/><rect x="32" y="46" width="12" height="20" rx="3" fill="#063381"/><rect x="52" y="32" width="12" height="34" rx="3" fill="#063381"/><rect x="72" y="40" width="12" height="26" rx="3" fill="#063381"/><rect x="92" y="22" width="12" height="44" rx="3" fill="#E00613"/><rect x="112" y="36" width="12" height="30" rx="3" fill="#063381"/><rect x="150" y="16" width="150" height="60" rx="8" fill="#fff" stroke="#e0e5ef"/><polyline points="162,62 190,44 214,52 240,30 268,40 290,26" fill="none" stroke="#063381" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="290" cy="26" r="4" fill="#E00613"/><rect x="20" y="86" width="90" height="50" rx="8" fill="#04205a"/><text x="32" y="106" font-family="Poppins,sans-serif" font-size="9" fill="#fff" opacity=".8">TOTAL</text><text x="32" y="126" font-family="Poppins,sans-serif" font-size="17" font-weight="700" fill="#fff">98,4%</text><rect x="120" y="86" width="180" height="50" rx="8" fill="#fff" stroke="#e0e5ef"/><circle cx="150" cy="111" r="16" fill="none" stroke="#e8edf6" stroke-width="8"/><circle cx="150" cy="111" r="16" fill="none" stroke="#2b56a6" stroke-width="8" stroke-dasharray="70 100" transform="rotate(-90 150 111)"/><rect x="178" y="98" width="100" height="6" rx="3" fill="#e8edf6"/><rect x="178" y="110" width="75" height="6" rx="3" fill="#e8edf6"/><rect x="178" y="122" width="50" height="6" rx="3" fill="#e8edf6"/>
+</svg></div>
+                <span class="tarjeta-brillo" aria-hidden="true"></span>
+              </a>
+              <div class="tarjeta-cuerpo">
+                <h3>Portafolio de Reportes BI</h3>
+                <p>Menú de accesos y tableros de Power BI por departamento y área, con permisos por usuario.</p>
+                <small class="tarjeta-dominio"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> portafolio-reportes-bi.onrender.com</small>
+              </div>
+              <div class="tarjeta-acciones">
+                <a class="btn btn--primario" href="https://portafolio-reportes-bi.onrender.com" target="_blank" rel="noopener">Ingresar <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="m9 6 6 6-6 6"/></svg></a>
+              </div>
+            </article>
+
+          </div>
+        </details>
+
+        <details class="mosaico" open data-mosaico="sitios">
+          <summary>
+            <span class="mosaico-icono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span>
+            <span class="mosaico-titulo">
+              <b>Sitios y servicios</b>
+              <span>Presencia pública de la empresa y plataforma de trabajo</span>
+            </span>
+            <span class="mosaico-cuenta">2</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono mosaico-flecha"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="mosaico-rejilla">
+
+            <article class="tarjeta tarjeta--rojo" data-tarjeta
+                     data-buscar="sitio web plásticos carmen página pública productos">
+              <a class="tarjeta-vista" href="https://www.plasticoscarmen.com" target="_blank" rel="noopener" aria-label="Abrir el sitio web de Plásticos Carmen" tabindex="-1">
+                <div class="vista vista--svg" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img">
+<rect width="320" height="150" fill="#f4f6fa"/>
+<rect x="24" y="14" width="272" height="150" rx="8" fill="#fff" stroke="#e0e5ef"/>
+<rect x="24" y="14" width="272" height="18" rx="8" fill="#04205a"/><rect x="24" y="24" width="272" height="8" fill="#04205a"/>
+<circle cx="35" cy="23" r="3" fill="#fff" opacity=".8"/><circle cx="45" cy="23" r="3" fill="#fff" opacity=".5"/><circle cx="55" cy="23" r="3" fill="#fff" opacity=".3"/><rect x="24" y="32" width="272" height="52" fill="#063381"/><rect x="40" y="46" width="110" height="10" rx="5" fill="#fff"/><rect x="40" y="62" width="70" height="7" rx="3.5" fill="#fff" opacity=".6"/><rect x="200" y="42" width="80" height="34" rx="6" fill="#E00613"/><rect x="40" y="96" width="52" height="56" rx="6" fill="#fff" stroke="#e0e5ef"/><rect x="48" y="104" width="36" height="24" rx="4" fill="#e8edf6"/><rect x="48" y="134" width="28" height="5" rx="2.5" fill="#93a6cb"/><rect x="104" y="96" width="52" height="56" rx="6" fill="#fff" stroke="#e0e5ef"/><rect x="112" y="104" width="36" height="24" rx="4" fill="#e8edf6"/><rect x="112" y="134" width="28" height="5" rx="2.5" fill="#93a6cb"/><rect x="168" y="96" width="52" height="56" rx="6" fill="#fff" stroke="#e0e5ef"/><rect x="176" y="104" width="36" height="24" rx="4" fill="#e8edf6"/><rect x="176" y="134" width="28" height="5" rx="2.5" fill="#93a6cb"/><rect x="232" y="96" width="52" height="56" rx="6" fill="#fff" stroke="#e0e5ef"/><rect x="240" y="104" width="36" height="24" rx="4" fill="#e8edf6"/><rect x="240" y="134" width="28" height="5" rx="2.5" fill="#93a6cb"/>
+</svg></div>
+                <span class="tarjeta-brillo" aria-hidden="true"></span>
+              </a>
+              <div class="tarjeta-cuerpo">
+                <h3>Sitio web Plásticos Carmen</h3>
+                <p>Página pública de la empresa: línea de productos, plantas y contacto comercial.</p>
+                <small class="tarjeta-dominio"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> plasticoscarmen.com</small>
+              </div>
+              <div class="tarjeta-acciones">
+                <a class="btn btn--primario" href="https://www.plasticoscarmen.com" target="_blank" rel="noopener">Visitar <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="m9 6 6 6-6 6"/></svg></a>
+              </div>
+            </article>
+
+            <article class="tarjeta tarjeta--claro" data-tarjeta
+                     data-buscar="microsoft 365 outlook teams sharepoint correo office">
+              <a class="tarjeta-vista" href="https://www.microsoft365.com" target="_blank" rel="noopener" aria-label="Abrir Microsoft 365" tabindex="-1">
+                <div class="vista vista--svg" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img">
+<rect width="320" height="150" fill="#f4f6fa"/>
+<rect x="50" y="26" width="100" height="48" rx="10" fill="#063381"/><rect x="60" y="38" width="24" height="24" rx="6" fill="#fff" opacity=".9"/><text x="94" y="56" font-family="Poppins,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#fff">Correo</text><rect x="170" y="26" width="100" height="48" rx="10" fill="#2b56a6"/><rect x="180" y="38" width="24" height="24" rx="6" fill="#fff" opacity=".9"/><text x="214" y="56" font-family="Poppins,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#fff">Equipos</text><rect x="50" y="90" width="100" height="48" rx="10" fill="#04205a"/><rect x="60" y="102" width="24" height="24" rx="6" fill="#fff" opacity=".9"/><text x="94" y="120" font-family="Poppins,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#fff">Archivos</text><rect x="170" y="90" width="100" height="48" rx="10" fill="#E00613"/><rect x="180" y="102" width="24" height="24" rx="6" fill="#fff" opacity=".9"/><text x="214" y="120" font-family="Poppins,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#fff">Agenda</text>
+</svg></div>
+                <span class="tarjeta-brillo" aria-hidden="true"></span>
+              </a>
+              <div class="tarjeta-cuerpo">
+                <h3>Microsoft 365</h3>
+                <p>Correo, Teams, SharePoint y archivos de la empresa. Entra con tu cuenta @plasticoscarmen.com.</p>
+                <small class="tarjeta-dominio"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></svg> microsoft365.com</small>
+              </div>
+              <div class="tarjeta-acciones">
+                <a class="btn btn--primario" href="https://www.microsoft365.com" target="_blank" rel="noopener">Ingresar <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="icono"><path d="m9 6 6 6-6 6"/></svg></a>
+              </div>
+            </article>
+
+          </div>
+        </details>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="pie-marca">
+  Copyright © <span id="anio">2026</span> Plásticos Carmen. Todos los derechos reservados.
+  Desarrollado por Departamento de IT
+  <span class="version">sitio público · versión 1.0.0</span>
+</footer>
+
+<script src="js/portal.js"></script>
+</body>
+</html>
