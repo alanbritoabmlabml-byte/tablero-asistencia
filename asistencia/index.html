@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#003080">
-<title>Control de Asistencia · Tablero de Gestión — Plásticos Carmen</title>
-<meta name="description" content="Tablero de gestión del Control de Asistencia de Plásticos Carmen S.R.L. Los datos se cargan y se procesan en el navegador del usuario.">
-<meta name="robots" content="noindex">
+<title>Tablero de Asistencia v14 — Plásticos Carmen</title>
 <style>
 /* ============================================================
    Tablero de Control de Asistencia — Plásticos Carmen S.R.L.
@@ -554,63 +552,214 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
 }
 .sabbox>label>input[type=checkbox]{width:18px;height:18px;min-height:0;flex:none;padding:0;margin:0}
 .sabbox>label{font-weight:600;font-size:13px}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Carlito:wght@400;700&display=swap">
+<style>
+/* ==========================================================================
+   v14 · CENTRO DE MANDO — capa de diseño única.
+   Un solo sistema para todo el tablero: una paleta, una tipografía, una
+   tarjeta, una gramática de gráfico. Redefine los tokens que ya usaba el
+   motor, así que todos los gráficos quedan consolidados sin tocar la lógica.
+   ========================================================================== */
 
-/* ============================================================
-   PANTALLA DE CARGA DE DATOS  (publicación pública)
-   El tablero se publica sin datos: el CSV lo carga cada usuario
-   y queda guardado sólo en su navegador (IndexedDB).
-   ============================================================ */
-.hdr .btn{text-decoration:none}
-.gate{
-  position:fixed;inset:0;z-index:200;overflow-y:auto;
-  background:var(--page);
-  display:flex;align-items:flex-start;justify-content:center;
-  padding:22px 14px calc(30px + env(safe-area-inset-bottom));
+/* ---------- 1. paleta: navy corporativo, rojo de acento, neutros fríos ---- */
+:root{
+  --page:#EDF0F6; --surface:#FFFFFF; --surface-2:#F5F8FC;
+  --ink:#0D1B2E; --ink-2:#44546F; --muted:#78879F;
+  --grid:#E5EAF2; --axis:#BFC9D9; --ring:rgba(13,27,46,.13);
+  /* series: una sola familia — azul de datos, rojo de marca para lo que exige
+     atención y un azul claro para la tercera categoría. Sin colores fuera de marca. */
+  --s1:#2B5BB5; --s2:#E00010; --s3:#6E93D3;
+  --seq1:#E3EAF7; --seq2:#C6D5EF; --seq3:#9FB8E3; --seq4:#6E93D3;
+  --seq5:#3F6CC2; --seq6:#12479F; --seq7:#002048;
+  --div-lo:#2B5BB5; --div-mid:#C8D2E0; --div-hi:#E00010;
+  --good:#0F7A3D; --warn:#B07C00; --warn-ink:#8A6200; --serious:#D14A22; --crit:#D0000F;
+  --up:#0F7A3D; --link:#003080;
+  --good-bg:#E8F3EC; --warn-bg:#FAF1DC; --crit-bg:#FBE7E9;
+  --r:14px; --shadow:0 1px 2px rgba(13,27,46,.05);
 }
-.gate[hidden]{display:none!important}
-.gcard{
-  width:100%;max-width:560px;background:var(--surface);
-  border:1px solid var(--ring);border-radius:16px;box-shadow:var(--shadow);
-  padding:22px 18px 18px;text-align:center;
+:root[data-theme="dark"]{
+  --page:#0C1016; --surface:#151A22; --surface-2:#1C222C;
+  --ink:#F1F5FA; --ink-2:#B0BCCD; --muted:#8494AC;
+  --grid:#232B37; --axis:#3B4553; --ring:rgba(255,255,255,.13);
+  --s1:#5E90E6; --s2:#EA4F5E; --s3:#3A6FC0;
+  --seq1:#16233A; --seq2:#1C3357; --seq3:#24467F; --seq4:#33609F;
+  --seq5:#4C82CC; --seq6:#7FA8E8; --seq7:#B9CFF4;
+  --div-lo:#5E90E6; --div-mid:#3B4553; --div-hi:#EA4F5E;
+  --good:#3FB871; --warn:#D9A43C; --warn-ink:#D9A43C; --serious:#F0785B; --crit:#FF6B76;
+  --good-bg:#11301F; --warn-bg:#2F2611; --crit-bg:#371519;
+  --shadow:none;
 }
-.gmark{
-  width:46px;height:46px;border-radius:12px;background:var(--brand);color:#fff;
-  display:inline-flex;align-items:center;justify-content:center;
-  font-weight:700;letter-spacing:.5px;font-size:17px;margin-bottom:12px;
+
+/* ---------- 2. tipografía ------------------------------------------------ */
+body{font-family:'Carlito','Segoe UI',Calibri,system-ui,sans-serif;font-size:15px;line-height:1.5;background:var(--page)}
+h1,h2,h3,h4{font-family:'Archivo','Segoe UI',system-ui,sans-serif;letter-spacing:-.012em}
+.tile .val,.tag b,.score .sr .v{font-family:'Archivo','Segoe UI',system-ui,sans-serif;font-weight:700;letter-spacing:-.025em}
+.tile .val,.mtx td,td.n,th.n,.tip .r .v{font-variant-numeric:tabular-nums}
+.plot text{font-family:'Carlito','Segoe UI',Calibri,system-ui,sans-serif}
+.vlab,.axl.b{font-family:'Archivo','Segoe UI',system-ui,sans-serif}
+
+/* ---------- 3. estructura ------------------------------------------------ */
+main{padding:14px 16px calc(44px + env(safe-area-inset-bottom))}
+@media (min-width:900px){ main{padding:20px clamp(16px,1.8vw,30px) 64px;max-width:1800px} }
+.secttl{margin:30px 0 12px;padding-top:16px;border-top:1px solid var(--ring);align-items:baseline}
+.secttl h2{font-size:15.5px;text-transform:none;letter-spacing:-.012em;color:var(--ink);font-weight:700}
+.secttl .hint{font-size:12px;color:var(--muted)}
+@media (min-width:900px){ .secttl::after{display:none} .secttl h2{font-size:16px} }
+#kpiTtl{border-top:0;padding-top:0;margin-top:18px}
+.scopebar{margin-bottom:14px}
+.tag{border-radius:999px;padding:5px 12px;font-size:12px;background:var(--surface);border-color:var(--ring)}
+.vdesc{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+/* ---------- 4. cabecera y navegación ------------------------------------ */
+.hdr{background:linear-gradient(120deg,var(--brand) 0%,#002a70 100%)}
+.hdr h1{font-size:16px;font-weight:700}
+.hdr .sub{color:rgba(255,255,255,.78)}
+.hdr .mark{border-radius:10px;font-family:'Archivo',sans-serif}
+.hdr .btn{border-radius:10px;font-size:13px}
+.views{background:var(--surface-2);border:1px solid var(--ring);border-radius:12px;padding:4px;gap:3px}
+.vbtn{border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.vbtn[aria-pressed=true]{background:var(--surface);color:var(--brand);box-shadow:0 1px 3px rgba(13,27,46,.12)}
+.segbar,.scopebar{gap:8px}
+
+/* ---------- 5. banda de mando y tarjetas KPI ---------------------------- */
+.kpis{gap:12px}
+@media (min-width:1240px){
+  .kpis[data-n="4"]{grid-template-columns:repeat(4,1fr)}
+  .kpis[data-n="5"]{grid-template-columns:repeat(5,1fr)}
+  .kpis[data-n="6"]{grid-template-columns:repeat(3,1fr)}
 }
-.gcard h2{font-size:18px;line-height:1.3;margin-bottom:6px}
-.glead{margin:0 0 16px;color:var(--ink-2);font-size:13.5px;line-height:1.5}
-.gdrop{
-  border:2px dashed var(--axis);border-radius:13px;background:var(--surface-2);
-  padding:24px 14px;cursor:pointer;display:grid;gap:5px;justify-items:center;
-  transition:border-color .15s,background .15s;
+.tile{border-radius:var(--r);padding:14px 15px 14px 17px;background:var(--surface);box-shadow:var(--shadow)}
+.tile.k-good,.tile.k-warn,.tile.k-crit{background:var(--surface)}   /* sin lavados de color: el dato manda */
+.tile::before{width:3px;opacity:.35;background:var(--axis)}
+.tile .lab{font-size:11.5px;letter-spacing:.055em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tile .val{font-size:30px;margin-top:6px}
+.tile .val .u{font-size:14px;font-weight:600;color:var(--ink-2);font-family:'Carlito',sans-serif;letter-spacing:0}
+.tile .sub{font-size:11.5px;color:var(--ink-2);margin-top:6px}
+.tile .meter{background:var(--seq1)}
+.tile .meter>i{background:var(--s1)}
+@media (min-width:900px){ .tile .val{font-size:30px} }
+
+.kpis .tile.hero{
+  grid-column:1/-1;border:0;border-radius:16px;padding:20px 22px;
+  background:linear-gradient(135deg,var(--brand-dark) 0%,#001c46 48%,#001028 100%);
+  color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:8px 30px;box-shadow:none;
 }
-.gdrop:hover,.gdrop:focus-visible{border-color:var(--brand);background:var(--good-bg)}
-.gdrop.over{border-color:var(--brand);background:rgba(36,84,200,.08)}
-.gdrop svg{width:30px;height:30px;color:var(--brand)}
-.gdrop strong{font-size:14.5px}
-.gdrop span{font-size:12.5px;color:var(--muted)}
-.gnote{margin:13px 0 0;font-size:12px;color:var(--muted);line-height:1.5;text-align:left}
-.gsec{
-  margin-top:12px;display:flex;gap:8px;align-items:flex-start;text-align:left;
-  background:var(--good-bg);border:1px solid rgba(15,138,60,.2);border-radius:10px;padding:10px 11px;
+.kpis .tile.hero::before{display:none}
+.tile.hero .lab{flex:0 0 100%;color:#93AEDF}
+.tile.hero .row{flex:0 0 auto;display:block}
+.tile.hero .val{font-size:clamp(44px,5vw,58px);color:#fff;letter-spacing:-.045em}
+.tile.hero .val .u{color:#B9CBE9;font-size:15px}
+.tile.hero .spark{display:none}
+.tile.hero .delta,.tile.hero .goal{color:#C9D8EF;margin-top:6px}
+.tile.hero .delta .vs,.tile.hero .goal .vs{color:#8FA9D4}
+.tile.hero .delta.up,.tile.hero .goal.up{color:#5FD08E}
+.tile.hero .delta.down,.tile.hero .goal.down{color:#FF8A93}
+.tile.hero .st{background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:3px 10px;margin-top:8px}
+.tile.hero .sub{flex:0 0 100%;order:9;color:#9FB6DC;font-size:11.5px}
+.tile.hero .score{flex:1 1 340px;order:8;margin:0;
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 22px;align-items:center}
+.tile.hero .score .gauge{grid-column:1;grid-row:1/span 4;align-self:center}
+.tile.hero .score .sr{grid-column:2;color:#C9D8EF;font-size:11.5px}
+.tile.hero .score .sr .lab{color:#93AEDF;text-transform:none;letter-spacing:0;font-weight:400}
+.tile.hero .score .sr .v{color:#fff}
+.tile.hero .score .sr .bar{background:rgba(255,255,255,.16)}
+.tile.hero .score .sr .bar i{background:#5E90E6}
+@media (max-width:760px){
+  .kpis .tile.hero{gap:6px 16px;padding:16px}
+  .tile.hero .score{flex-basis:100%;gap:6px 14px}
 }
-.gsec svg{width:16px;height:16px;flex:none;color:var(--good);margin-top:1px}
-.gsec span{font-size:12px;color:var(--ink-2);line-height:1.5}
-.gerr{
-  margin:12px 0 0;font-size:12.5px;color:var(--crit);text-align:left;
-  background:var(--crit-bg);border:1px solid rgba(224,0,16,.22);border-radius:10px;padding:9px 11px;
+
+/* ---------- 6. tarjetas de gráfico: una sola tarjeta para todo ---------- */
+.grid{gap:14px}
+.card{border-radius:var(--r);border:1px solid var(--ring);padding:16px 17px 14px;box-shadow:var(--shadow)}
+.chead h3{font-size:14.5px;font-weight:700;color:var(--ink)}
+.chead .cs{font-size:12px;color:var(--muted);margin-top:4px;max-width:70ch}
+.tbtn{border-radius:9px;font-size:12px;background:var(--surface-2);border-color:var(--ring)}
+.tbtn[aria-pressed=true]{background:var(--brand);border-color:var(--brand)}
+.legend{font-size:12px;color:var(--ink-2);margin:10px 0 2px;gap:14px}
+.legend .sw{width:10px;height:10px;border-radius:3px}
+.legend .ln{width:18px;height:2.5px}
+.note{font-size:11.5px;color:var(--muted);margin-top:12px}
+.card .cshint{font-size:11px;margin-top:4px}
+@media (min-width:760px){
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .card{grid-column:span 12}
+  .card.half{grid-column:span 6}
+  .card.third{grid-column:span 6}
+  .card.twothird{grid-column:span 6}
 }
-.gerr[hidden]{display:none!important}
-.gbusy{margin:13px 0 0;font-size:12.5px;color:var(--ink-2)}
-.gbusy[hidden]{display:none!important}
-.gback{display:inline-block;margin-top:15px;font-size:12.5px;color:var(--link);text-decoration:none}
-.gback:hover{text-decoration:underline}
-@media (min-width:600px){
-  .gate{padding-top:44px}
-  .gcard{padding:28px 26px 22px}
-  .gcard h2{font-size:20px}
+@media (min-width:1100px){
+  .card.third{grid-column:span 4}
+  .card.twothird{grid-column:span 8}
+  .card.c5{grid-column:span 5}
+  .card.c7{grid-column:span 7}
 }
+
+/* ---------- 7. gramática de gráfico ------------------------------------- */
+.axl{font-size:11px;fill:var(--muted)}
+.axl.b{font-size:11px;font-weight:600;fill:var(--ink-2)}
+.vlab{font-size:11.5px;fill:var(--ink-2);font-weight:600}
+.gl{stroke:var(--grid);stroke-width:1}
+.bl{stroke:var(--axis);stroke-width:1}
+.crosshair{stroke:var(--axis)}
+.plot{margin-top:8px}
+.tip{background:var(--ink);border:0;color:var(--page);border-radius:10px;
+  box-shadow:0 10px 26px rgba(13,27,46,.28);font-size:12.5px;padding:9px 11px}
+.tip .t{color:rgba(255,255,255,.66);font-weight:600}
+.tip .r .nm{color:rgba(255,255,255,.75)}
+.tip .r .v{color:#fff}
+:root[data-theme="dark"] .tip{background:#0B1018;color:#F1F5FA}
+.scalelg{font-size:11.5px;margin-top:10px}
+.scalelg .bar{border-radius:3px}
+
+/* ---------- 8. hallazgos: franja de severidad, no caja de color --------- */
+.ins{gap:12px;margin-top:10px}
+.ins li{background:var(--surface);border:1px solid var(--ring);border-left:3px solid var(--axis);
+  border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.5}
+.ins li.crit{border-left-color:var(--crit)}
+.ins li.warn{border-left-color:var(--warn)}
+.ins li.good{border-left-color:var(--good)}
+.ins li.info{border-left-color:var(--s1)}
+.ins li .why{color:var(--muted);font-size:12px}
+.ins li .act{font-size:12px;color:var(--ink-2)}
+
+/* ---------- 9. tablas ---------------------------------------------------- */
+th{background:var(--surface-2);font-size:11px;letter-spacing:.05em;color:var(--muted)}
+td{font-size:13px;border-bottom:1px solid var(--grid)}
+tbody tr:hover{background:var(--surface-2)}
+tfoot td{background:var(--surface-2);border-top:1px solid var(--axis)}
+.tv{border-radius:10px;border-color:var(--ring)}
+
+/* ---------- 10. menú de descargas --------------------------------------- */
+.dl{position:relative;flex:none}
+.dlm{position:absolute;right:0;top:calc(100% + 6px);z-index:70;min-width:292px;background:var(--surface);
+  border:1px solid var(--ring);border-radius:12px;box-shadow:0 14px 34px rgba(13,27,46,.22);padding:6px;display:grid;gap:2px}
+.dlm button{display:grid;gap:1px;text-align:left;background:none;border:0;border-radius:9px;padding:9px 11px;cursor:pointer;width:100%}
+.dlm button:hover,.dlm button:focus-visible{background:var(--surface-2)}
+.dlm b{font-size:13.5px;font-weight:600;color:var(--ink)}
+.dlm small{font-size:11.5px;color:var(--muted);line-height:1.35}
+@media (max-width:899px){ .dlm{right:auto;left:0;min-width:min(300px,92vw)} }
+
+/* ---------- 11. estado vacío -------------------------------------------- */
+.vacio{max-width:560px;margin:60px auto;text-align:center;display:grid;gap:14px;justify-items:center}
+.vacio h2{font-size:20px}
+.vacio p{color:var(--ink-2);font-size:14px;line-height:1.5;margin:0}
+.vacio .bigbtn{background:var(--brand);color:#fff;border:0;border-radius:11px;min-height:46px;padding:0 20px;
+  font-size:14.5px;font-weight:600;cursor:pointer}
+
+/* ---------- 12. filtros: barra de contexto ------------------------------ */
+.filters{background:var(--surface);border-bottom:1px solid var(--ring)}
+.fhead .fsum{white-space:normal;font-size:12.5px}
+.fhead>button{border-radius:10px;font-size:13.5px}
+.chip{border-radius:999px;font-size:12.5px}
+@media (min-width:900px){
+  .fhead{display:flex;padding:10px clamp(16px,1.8vw,30px)}
+  .fwrap{gap:12px;border-top:1px solid var(--grid);padding:10px clamp(16px,1.8vw,30px) 12px}
+}
+footer{font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -621,9 +770,6 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
     <div class="sub" id="hdrSub">Plásticos Carmen S.R.L. — cargando…</div>
   </div>
   <div class="acts">
-    <a class="btn" href="../" title="Volver al portal de sistemas">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 7.2 8 2.6l5.5 4.6M4.2 8.6v4.8h7.6V8.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Portal</a>
     <button class="btn" id="btnCsv" type="button">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v8m0 0L5 6.5m3 3 3-3M2.5 11v2.5h11V11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       Cargar CSV</button>
@@ -634,32 +780,23 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
     <button class="btn" id="btnCfg" type="button" aria-haspopup="dialog" aria-controls="cfg">
       <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Configuración</button>
+    <div class="dl">
+      <button class="btn" id="btnDl" type="button" aria-haspopup="menu" aria-expanded="false">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8v8.4M4.8 7l3.2 3.2L11.2 7M2.5 13.2h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Descargar</button>
+      <div class="dlm" id="dlMenu" role="menu" hidden>
+        <button type="button" role="menuitem" data-dl="areas"><b>Resumen por área (CSV)</b><small>Una fila por departamento con los indicadores del periodo filtrado</small></button>
+        <button type="button" role="menuitem" data-dl="mes"><b>Serie mensual (CSV)</b><small>Asistencia, puntualidad, vacaciones, licencias y horas extra por mes</small></button>
+        <button type="button" role="menuitem" data-dl="fer"><b>Feriados y fines de semana (CSV)</b><small>Cada feriado trabajado con personas, horas y áreas</small></button>
+        <button type="button" role="menuitem" data-dl="det"><b>Detalle nominal (CSV)</b><small>Persona, día, marcaciones, atraso y novedad, con los filtros aplicados</small></button>
+        <button type="button" role="menuitem" data-dl="pdf"><b>Reporte ejecutivo (PDF)</b><small>Abre el diálogo de impresión: elige «Guardar como PDF»</small></button>
+      </div>
+    </div>
     <button class="btn" id="btnPrint" type="button">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 5.5v-3h7v3M4.5 11.5h7v3h-7zM2.5 5.5h11v6h-2m-7 0h-2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       Imprimir</button>
   </div>
 </header>
-
-<div class="gate" id="gate" hidden>
-  <div class="gcard">
-    <div class="gmark">PC</div>
-    <h2>Control de Asistencia · Tablero de Gestión</h2>
-    <p class="glead">Este tablero se publica sin datos. Carga el export del Control de Asistencia y todos los indicadores se calculan en tu navegador.</p>
-    <div class="gdrop" id="gdrop" tabindex="0" role="button" aria-label="Cargar archivo CSV del Control de Asistencia">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 16.5V19a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <strong>Arrastra aquí el archivo CSV</strong>
-      <span>o haz clic para elegirlo</span>
-    </div>
-    <p class="gbusy" id="gbusy" hidden>Procesando el archivo…</p>
-    <p class="gerr" id="gerr" hidden></p>
-    <p class="gnote">Formato esperado: el export ancho del Control de Asistencia, separado por «;», con CI, Nombre, Departamento y una columna por fecha (aaaa-mm-dd o dd/mm/aaaa).</p>
-    <div class="gsec">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2M3.5 7h9v6h-9z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-      <span>El archivo no se sube a ningún servidor: queda guardado únicamente en este navegador, y la próxima vez el tablero se abre con esos mismos datos.</span>
-    </div>
-    <a class="gback" href="../">‹ Volver al portal de sistemas</a>
-  </div>
-</div>
 
 <div class="filters">
   <div class="fhead">
@@ -733,17 +870,17 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
   <div class="scopebar" id="scopebar"></div>
   <div class="segbar" id="segbar" role="group" aria-label="Secciones de planta" hidden></div>
 
-  <section data-sec="insights" id="secInsights" class="grid"><div class="card" id="cIns"></div></section>
-
   <div class="secttl" id="kpiTtl"><h2 id="kpiH">Indicadores</h2><span class="hint" id="kpiHint"></span></div>
   <div class="kpis" id="kpiWrap"></div>
+
+  <section data-sec="insights" id="secInsights" class="grid"><div class="card" id="cIns"></div></section>
 
   <section data-sec="secciones">
     <div class="secttl"><h2>Secciones de planta</h2><span class="hint">Bolsas, Termoformado, Expandido, Inyección, Reciclado, Rafia y Tanques. Cada sección agrupa uno o más departamentos del sistema (editable en Configuración). Clic en una sección filtra todo el tablero.</span></div>
     <div class="grid">
       <div class="card" id="cSecc"></div>
-      <div class="card half" id="cSeccKpi"></div>
-      <div class="card half" id="cSeccHoras"></div>
+      <div class="card c7" id="cSeccKpi"></div>
+      <div class="card c5" id="cSeccHoras"></div>
     </div>
   </section>
 
@@ -755,8 +892,8 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
   <section data-sec="tiempo">
     <div class="secttl"><h2>Asistencia en el tiempo</h2></div>
     <div class="grid">
-      <div class="card half" id="cAsisSem"></div>
-      <div class="card half" id="cTend"></div>
+      <div class="card c7" id="cAsisSem"></div>
+      <div class="card c5" id="cTend"></div>
       <div class="card" id="cFreq"></div>
     </div>
   </section>
@@ -780,11 +917,21 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
     </div>
   </section>
 
+  <section data-sec="ausencias">
+    <div class="secttl"><h2>Vacaciones, licencias y trabajo en día no laborable</h2><span class="hint">Días de vacación y licencia por mes y por área, reparto de la hora extra (fin de semana, feriado y exceso en día hábil) y detalle de cada feriado trabajado.</span></div>
+    <div class="grid">
+      <div class="card half" id="cVacMes"></div>
+      <div class="card half" id="cVacSec"></div>
+      <div class="card half" id="cExtraMes"></div>
+      <div class="card half" id="cFer"></div>
+    </div>
+  </section>
+
   <section data-sec="areas">
     <div class="secttl"><h2>Estructura y desempeño por área</h2></div>
     <div class="grid">
-      <div class="card half" id="cDep"></div>
-      <div class="card half" id="cDepKpi"></div>
+      <div class="card c5" id="cDep"></div>
+      <div class="card c7" id="cDepKpi"></div>
     </div>
   </section>
 
@@ -839,14 +986,13 @@ footer{padding:18px 14px calc(24px + env(safe-area-inset-bottom));text-align:cen
     <span class="io"><button class="tbtn" type="button" id="cfgExport" title="Descargar la configuración como archivo JSON">Exportar</button>
     <button class="tbtn" type="button" id="cfgImport" title="Cargar una configuración exportada">Importar</button>
     <input type="file" id="cfgFile" accept="application/json,.json" hidden></span>
-    <button class="tbtn" type="button" id="cfgDatos" title="Quitar del navegador el archivo cargado">Quitar datos</button>
     <button class="tbtn" type="button" id="cfgReset">Restablecer valores</button>
     <button class="tbtn pri" type="button" id="cfgDone">Listo</button>
   </div>
 </aside>
 
 <script>/* ---- datos embebidos: export del Control de Asistencia ---- */
-var DATASET = null;   /* publicación pública: sin datos embebidos */
+var DATASET=null;   /* sin datos embebidos: cada usuario carga su CSV */
 </script>
 <script>
 /* =====================================================================
@@ -1162,6 +1308,8 @@ function aggregate(rango) {
     empsAct: 0, empFalta: {}, empAtr: {}, byDep: [], byDay: [], byMes: {},
     heat: [], histIn: new Int32Array(288), histOut: new Int32Array(288),
     empProg: {}, empsEnd: 0,
+    vacT: {}, licT: {}, fer: {}, minExtraFer: 0, minExtraFds: 0, ferDias: 0, fdsDias: 0,
+    vacEmps: {}, licEmps: {}, minFalta: 0,
     fMinTrab: 0, fExtra: 0, fPres: 0, fFalta: 0, fVac: 0, fLic: 0, fInc: 0, fAtr: 0, fSalAnt: 0,
     detail: [], jorDep: [], sem: {}, jorF: [0, 0, 0, 0],
     wk: {},                      /* series semanales del universo, para sparklines */
@@ -1171,7 +1319,8 @@ function aggregate(rango) {
   var i, j;
   for (i = 0; i < nDep; i++) {
     A.byDep.push({dep: i, emps: 0, empsEnd: 0, prog: 0, pres: 0, falta: 0, atr: 0, punt: 0, min: 0, minAtr: 0,
-                  presT: 0, inc: 0, jorOk: 0, jorVal: 0, extraNoLab: 0, sobre: 0, salAnt: 0, vac: 0, lic: 0});
+                  presT: 0, inc: 0, jorOk: 0, jorVal: 0, extraNoLab: 0, sobre: 0, salAnt: 0, vac: 0, lic: 0,
+                  extraFer: 0, extraFds: 0, ferDias: 0, minFalta: 0});
     A.jorDep.push([0, 0, 0, 0]);
     A.heat.push({});
   }
@@ -1195,7 +1344,8 @@ function aggregate(rango) {
     if (!em[e]) continue;
     var dep = PKG.emp[e].d, st = est[i], mes = PKG.fechas[d].slice(0, 7);
     var bd = A.byDay[d] || (A.byDay[d] = {p: 0, f: 0, j: 0, a: 0, prog: prog[i]});
-    var bm = A.byMes[mes] || (A.byMes[mes] = {prog: 0, pres: 0, atr: 0, punt: 0, falta: 0});
+    var bm = A.byMes[mes] || (A.byMes[mes] = {prog: 0, pres: 0, atr: 0, punt: 0, falta: 0,
+      vac: 0, vacN: 0, licBM: 0, licOt: 0, sobre: 0, extraFds: 0, extraFer: 0, ferDias: 0, min: 0, minFalta: 0});
     var hc = A.heat[dep][mes] || (A.heat[dep][mes] = {prog: 0, pres: 0});
     var bdep = A.byDep[dep];
 
@@ -1210,13 +1360,25 @@ function aggregate(rango) {
       A.empProg[e] = (A.empProg[e] || 0) + 1;
       if (st === EST.FALTA) { A.falta++; bdep.falta++; bm.falta++;
         if (R.cd[i] & BIT.I) A.faltaI++; else A.faltaSR++;
+        var objF = perfilDia(perfilDe(dep), DOW[d], -1).obj;
+        A.minFalta += objF; bdep.minFalta += objF; bm.minFalta += objF;
         A.empFalta[e] = (A.empFalta[e] || 0) + 1; }
     }
     if (st === EST.PRES) {
       A.pres++; bdep.presT++; W.presT++; W.min += trab[i];
       A.minTrab += trab[i]; bdep.min += trab[i];
-      if (prog[i]) { A.minSobre += extra[i]; bdep.sobre += extra[i]; W.extra += extra[i]; }
-      else { A.minExtraNoLab += trab[i]; bdep.extraNoLab += trab[i]; W.extra += trab[i]; }
+      bm.min += trab[i];
+      if (prog[i]) { A.minSobre += extra[i]; bdep.sobre += extra[i]; W.extra += extra[i]; bm.sobre += extra[i]; }
+      else {
+        A.minExtraNoLab += trab[i]; bdep.extraNoLab += trab[i]; W.extra += trab[i];
+        if (FERSET[d]) {
+          A.minExtraFer += trab[i]; bdep.extraFer += trab[i]; bm.extraFer += trab[i];
+          A.ferDias++; bdep.ferDias++; bm.ferDias++;
+          var fk = PKG.fechas[d], FR = A.fer[fk] || (A.fer[fk] = {d: d, pres: 0, min: 0, deps: {}, secs: {}});
+          FR.pres++; FR.min += trab[i]; FR.deps[dep] = (FR.deps[dep] || 0) + 1;
+          var sq = seccionDe(dep); FR.secs[sq] = (FR.secs[sq] || 0) + 1;
+        } else { A.minExtraFds += trab[i]; bdep.extraFds += trab[i]; bm.extraFds += trab[i]; A.fdsDias++; }
+      }
       if (inc[i]) { A.inc++; bdep.inc++; W.inc++; }
       if (ent[i] < 0 && sal[i] >= 0) A.sinEnt++;
       if (prog[i] && ent[i] >= 0) {
@@ -1227,8 +1389,16 @@ function aggregate(rango) {
       if (jor[i]) { A.jor[jor[i]]++; A.jorVal++; A.jorDep[dep][jor[i]]++;
         bdep.jorVal++; W.jorVal++; if (jor[i] >= 2) { bdep.jorOk++; W.jorOk++; } }
       if (santi[i] > 0) { A.salAnt++; A.minSalAnt += santi[i]; bdep.salAnt++; W.salAnt++; }
-    } else if (st === EST.VAC) { A.vac++; bdep.vac++; }
-    else if (st === EST.LIC) { A.lic++; bdep.lic++; }
+    } else if (st === EST.VAC) { A.vac++; bdep.vac++; A.vacEmps[e] = 1;
+      if (R.cd[i] & BIT.VDN) { A.vacT.VDN = (A.vacT.VDN || 0) + 1; bm.vacN++; }
+      else { A.vacT.V = (A.vacT.V || 0) + 1; bm.vac++; } }
+    else if (st === EST.LIC) { A.lic++; bdep.lic++; A.licEmps[e] = 1;
+      var cl = R.cd[i];
+      if (cl & BIT.BM) { A.licT.BM = (A.licT.BM || 0) + 1; bm.licBM++; }
+      else { bm.licOt++;
+        if (cl & BIT.LR) A.licT.LR = (A.licT.LR || 0) + 1;
+        else if (cl & BIT.LDM) A.licT.LDM = (A.licT.LDM || 0) + 1;
+        else if (cl & BIT.LPM) A.licT.LPM = (A.licT.LPM || 0) + 1; } }
     else A.noLab++;
 
     /* ---- foco (con filtro de novedad) ---- */
@@ -1263,7 +1433,8 @@ function aggregate(rango) {
   for (i = 0; i < nDep; i++) {
     var sc = seccionDe(i), bd2 = A.byDep[i], S = A.bySec[sc];
     if (!S) S = A.bySec[sc] = {sec: sc, deps: [], emps: 0, empsEnd: 0, prog: 0, pres: 0, falta: 0, atr: 0, punt: 0, minAtr: 0, presT: 0, inc: 0,
-      jorOk: 0, jorVal: 0, extraNoLab: 0, sobre: 0, salAnt: 0, vac: 0, lic: 0, min: 0};
+      jorOk: 0, jorVal: 0, extraNoLab: 0, sobre: 0, salAnt: 0, vac: 0, lic: 0, min: 0,
+      extraFer: 0, extraFds: 0, ferDias: 0, minFalta: 0};
     S.deps.push(i);
     for (var kk in bd2) if (kk !== 'dep' && typeof bd2[kk] === 'number') S[kk] += bd2[kk];
   }
@@ -1810,26 +1981,29 @@ var VIEWS = {
     label: 'Gerencia',
     desc: 'Una pantalla: índice de cumplimiento, indicadores en porcentaje con su desviación frente a la meta y al periodo anterior, valores absolutos, hallazgos accionables, semáforo por área y comparación Administración / secciones de Fábrica.',
     grupo: null, kpis: 'gerencia', segbar: false,
-    secs: ['insights', 'sem', 'secciones', 'tiempo'], cards: ['cIns', 'cSem', 'cSeccKpi', 'cSeccHoras', 'cAsisSem', 'cTend']
+    secs: ['insights', 'sem', 'secciones', 'tiempo', 'ausencias'],
+    cards: ['cIns', 'cSem', 'cSeccKpi', 'cSeccHoras', 'cAsisSem', 'cTend', 'cExtraMes', 'cVacMes']
   },
   rrhh: {
     label: 'Jefatura de RRHH',
     desc: 'Gestión operativa: faltas, atrasos, salidas anticipadas, licencias y calidad de marcación, con ranking nominal y detalle exportable para tomar acción persona por persona.',
     grupo: null, kpis: 'rrhh', segbar: false,
-    secs: ['insights', 'tiempo', 'marcacion', 'areas', 'nominal', 'calidad'], cards: ['cIns', 'cFreq', 'cFlujo', 'cDep', 'cDepKpi', 'cRank', 'cRankAtr', 'cDet', 'cQa']
+    secs: ['insights', 'tiempo', 'ausencias', 'marcacion', 'areas', 'nominal', 'calidad'],
+    cards: ['cIns', 'cFreq', 'cFlujo', 'cVacMes', 'cVacSec', 'cFer', 'cDep', 'cDepKpi', 'cRank', 'cRankAtr', 'cDet', 'cQa']
   },
   planta: {
     label: 'Producción / Planta',
     desc: 'Solo áreas productivas, segmentadas en Bolsas, Termoformado, Expandido, Inyección, Reciclado, Rafia y Tanques. Cada sección se mide con el perfil Fábrica (o el que tenga asignado). Marcación real, permanencia, salidas anticipadas y horas extra.',
     grupo: 'planta', kpis: 'planta', segbar: true,
-    secs: ['insights', 'secciones', 'sem', 'marcacion', 'jornada'], cards: ['cIns', 'cSecc', 'cSeccKpi', 'cSeccHoras', 'cSem', 'cIng', 'cSal', 'cFlujo', 'cJor', 'cJorDep', 'cHoras', 'cHeat']
+    secs: ['insights', 'secciones', 'sem', 'marcacion', 'jornada', 'ausencias'],
+    cards: ['cIns', 'cSecc', 'cSeccKpi', 'cSeccHoras', 'cSem', 'cIng', 'cSal', 'cFlujo', 'cJor', 'cJorDep', 'cHoras', 'cHeat', 'cExtraMes', 'cFer']
   },
   todo: {
     label: 'Explorar',
     desc: 'Todos los indicadores, gráficos y tablas, para análisis libre.',
     grupo: null, kpis: 'todo', segbar: true,
-    secs: ['insights', 'secciones', 'sem', 'tiempo', 'marcacion', 'jornada', 'areas', 'nominal', 'calidad'],
-    cards: ['cIns', 'cSecc', 'cSeccKpi', 'cSeccHoras', 'cSem', 'cAsisSem', 'cTend', 'cFreq', 'cIng', 'cSal', 'cFlujo', 'cJor', 'cJorDep', 'cHoras', 'cHeat', 'cDep', 'cDepKpi', 'cRank', 'cRankAtr', 'cDet', 'cQa']
+    secs: ['insights', 'secciones', 'sem', 'tiempo', 'marcacion', 'jornada', 'ausencias', 'areas', 'nominal', 'calidad'],
+    cards: ['cIns', 'cSecc', 'cSeccKpi', 'cSeccHoras', 'cSem', 'cAsisSem', 'cTend', 'cFreq', 'cIng', 'cSal', 'cFlujo', 'cJor', 'cJorDep', 'cHoras', 'cHeat', 'cVacMes', 'cVacSec', 'cExtraMes', 'cFer', 'cDep', 'cDepKpi', 'cRank', 'cRankAtr', 'cDet', 'cQa']
   }
 };
 function cardOn(id) { return VIEWS[VIEW].cards.indexOf(id) >= 0; }
@@ -1905,6 +2079,11 @@ function metricas(X) {
   m.incPct = safePct(X.inc, X.pres);
   m.compPct = m.incPct === null ? null : 100 - m.incPct;
   m.hTrab = X.minTrab / 60; m.hFds = X.minExtraNoLab / 60; m.hSobre = X.minSobre / 60;
+  m.hFer = (X.minExtraFer || 0) / 60; m.hFinde = (X.minExtraFds || 0) / 60;
+  m.hPerd = (X.minFalta || 0) / 60; m.ferDias = X.ferDias || 0; m.fdsDias = X.fdsDias || 0;
+  m.vacDias = X.vac; m.licDias = X.lic;
+  m.vacPers = Object.keys(X.vacEmps || {}).length; m.licPers = Object.keys(X.licEmps || {}).length;
+  m.ausTot = safePct(X.falta + X.vac + X.lic, X.prog + X.vac + X.lic);
   m.hDia = X.pres ? (X.minTrab / 60) / X.pres : null;
   m.hExtra = m.hFds + m.hSobre;
   m.salAnt = safePct(X.salAnt, X.jorVal);
@@ -1996,11 +2175,39 @@ function pts(v) { return fmt(v, 1) + ' pts'; }
 var EPS_PTS = 0.1;
 
 /* ------------------------------------------------------------- KPIs */
+/* aro de cumplimiento para la banda de mando (v14) */
+function gaugeSvg(val, metaV, size) {
+  size = size || 132;
+  var cx = size / 2, cy = size / 2, r = size / 2 - 11, sw = Math.max(10, size * .085);
+  var A0 = -135, A1 = 135, span = A1 - A0;
+  var pol = function (deg, rr) { var a = (deg - 90) * Math.PI / 180; return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)]; };
+  var arc = function (a0, a1) { var p0 = pol(a0, r), p1 = pol(a1, r);
+    return 'M' + p0[0].toFixed(1) + ' ' + p0[1].toFixed(1) + 'A' + r + ' ' + r + ' 0 ' + ((a1 - a0 > 180) ? 1 : 0) + ' 1 ' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1); };
+  var g = sv('svg', {width: size, height: size, viewBox: '0 0 ' + size + ' ' + size, class: 'gauge', 'aria-hidden': 'true'});
+  g.appendChild(sv('path', {d: arc(A0, A1), fill: 'none', stroke: 'rgba(255,255,255,.16)', 'stroke-width': sw, 'stroke-linecap': 'round'}));
+  if (val !== null && isFinite(val)) {
+    var a = A0 + span * Math.max(0, Math.min(100, val)) / 100;
+    var p = sv('path', {d: arc(A0, a), fill: 'none', stroke: '#5E90E6', 'stroke-width': sw, 'stroke-linecap': 'round'});
+    var len = 2 * Math.PI * r * (a - A0) / 360;
+    p.setAttribute('stroke-dasharray', (len + 1) + ' 999');
+    p.setAttribute('stroke-dashoffset', len + 1);
+    g.appendChild(p);
+    requestAnimationFrame(function () {
+      p.style.transition = 'stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)';
+      p.setAttribute('stroke-dashoffset', 0);
+    });
+  }
+  if (metaV !== null && isFinite(metaV)) {
+    var am = A0 + span * metaV / 100, q0 = pol(am, r + sw / 2 + 1), q1 = pol(am, r - sw / 2 - 1);
+    g.appendChild(sv('line', {x1: q0[0], y1: q0[1], x2: q1[0], y2: q1[1], stroke: '#fff', 'stroke-width': 2}));
+  }
+  return g;
+}
 function renderKpis() {
   var host = el('kpiWrap'); host.textContent = '';
   var M = metricas(A), MP = hasPrev() ? metricas(AP) : {};
   var set = VIEWS[VIEW].kpis, sc = pfScope();
-  el('kpiH').textContent = {gerencia: 'Indicadores para Gerencia', rrhh: 'Indicadores para Recursos Humanos',
+  el('kpiH').textContent = {gerencia: 'Lo que decide la Gerencia', rrhh: 'Indicadores para Recursos Humanos',
     planta: 'Indicadores de planta', todo: 'Todos los indicadores'}[set];
   el('kpiHint').textContent = 'Cada tarjeta muestra el porcentaje, su desviación frente a la meta (Configuración) ' + (hasPrev() ? 'y frente al periodo inmediatamente anterior de igual duración, ' : '') +
     'y los valores absolutos que lo explican. Las tasas se calculan sobre el universo de fecha, área y empleado; el filtro de novedad acota gráficos de detalle y tablas.';
@@ -2086,8 +2293,25 @@ function renderKpis() {
     delta: {cur: M.hTrab, prev: MP.hTrab, fmt: function (v) { return fmt(v, 0) + ' h'; }, goodUp: null, eps: 1},
     spark: Wk(function (w) { return w.min / 60; }),
     sub: 'Promedio ' + fmt(M.hDia || 0, 1) + ' h netas por día presente'}); };
+  var kCapPerd = function () { return tile(host, {label: 'Capacidad perdida por inasistencia', value: fmt(M.hPerd, 0), unit: 'h',
+    state: M.aus === null ? null : toneMeta(M.aus, 'aus', false),
+    stateText: M.aus === null ? '' : labelMeta(M.aus, 'aus', false, ['dentro de la meta', 'sobre la meta', 'muy por encima de la meta']),
+    delta: {cur: M.hPerd, prev: MP.hPerd, fmt: function (v) { return fmt(v, 0) + ' h'; }, goodUp: false, eps: 1},
+    spark: Wk(function (w) { return w.falta; }),
+    sub: fmt(A.falta) + ' jornadas sin justificar valorizadas a la jornada objetivo de cada perfil · equivale a ' +
+      fmt(M.fte || 0, 1) + ' personas ausentes todo el periodo'}); };
+  var kVacLic = function () { return tile(host, {label: 'Vacaciones y licencias', value: fmt(A.vac + A.lic), unit: 'días',
+    delta: {cur: A.vac + A.lic, prev: hasPrev() ? AP.vac + AP.lic : null, fmt: function (v) { return fmt(v, 0); }, goodUp: null, eps: .5},
+    sub: fmt(A.vac) + ' de vacación (' + fmt(A.vacT.VDN || 0) + ' VDN) en ' + fmt(Object.keys(A.vacEmps).length) + ' personas · ' +
+      fmt(A.lic) + ' de licencia (' + fmt(A.licT.BM || 0) + ' baja médica) · ' + pct(A.vac + A.lic, A.prog + A.vac + A.lic, 1) + ' del calendario',
+    info: true}); };
+  var kFerTrab = function () { return tile(host, {label: 'Feriados trabajados', value: fmt(A.ferDias), unit: 'jornadas',
+    delta: {cur: A.ferDias, prev: hasPrev() ? AP.ferDias : null, fmt: function (v) { return fmt(v, 0); }, goodUp: false, eps: .5},
+    sub: fmt(M.hFer, 0) + ' h en ' + Object.keys(A.fer).length + ' feriados del calendario · hora extra por definición · ' +
+      fmt(M.hFinde, 0) + ' h más en fines de semana', info: true}); };
   var kIndice = function () {
     var ex = document.createElement('div'); ex.className = 'score';
+    ex.appendChild(gaugeSvg(M.indice, 92, 132));
     [['Asistencia', M.asis, INDICE_PESOS.asis * 100], ['Puntualidad', M.punt, INDICE_PESOS.punt * 100], ['Permanencia', M.jorOk, INDICE_PESOS.jor * 100], ['Marcación completa', M.compPct, INDICE_PESOS.comp * 100]].forEach(function (p) {
       var r = document.createElement('div'); r.className = 'sr';
       var left = document.createElement('div');
@@ -2108,10 +2332,11 @@ function renderKpis() {
       sub: 'Promedio ponderado de las cuatro dimensiones; los pesos son editables en el código (INDICE_PESOS).', extra: ex});
   };
 
-  if (set === 'gerencia') { kIndice(); kAsis(false); kPunt(); kAus(); kJor(); kSalAnt(); kExtraTot(); kPresDia(); kPers(); }
-  else if (set === 'rrhh') { kFaltas(); kAtr(); kSalAnt(); kInc(); kFaltones(); kVac(); kLic(); kAus(); kPunt(); kPresDia(); }
-  else if (set === 'planta') { kAsis(true); kPunt(); kSalAnt(); kJor(); kFds(); kSobre(); kInc(); kPresDia(); }
-  else { kIndice(); kAsis(false); kPunt(); kAus(); kSalAnt(); kPers(); kPresDia(); kJor(); kFds(); kSobre(); kExtraTot(); kHoras(); kFaltas(); kAtr(); kInc(); kFaltones(); kVac(); kLic(); }
+  host.dataset.n = {gerencia: 5, rrhh: 6, planta: 6}[set] || 4;
+  if (set === 'gerencia') { kIndice(); kCapPerd(); kAus(); kPunt(); kExtraTot(); kVacLic(); }
+  else if (set === 'rrhh') { kFaltas(); kFaltones(); kAtr(); kInc(); kVacLic(); kFerTrab(); }
+  else if (set === 'planta') { kAsis(true); kPunt(); kSalAnt(); kJor(); kFds(); kFerTrab(); }
+  else { kIndice(); kCapPerd(); kAsis(false); kPunt(); kAus(); kSalAnt(); kPers(); kPresDia(); kJor(); kFds(); kSobre(); kExtraTot(); kVacLic(); kFerTrab(); kHoras(); kFaltas(); kAtr(); kInc(); kFaltones(); kVac(); kLic(); }
 }
 
 /* --------------------------------------------------------------- hallazgos */
@@ -2254,7 +2479,7 @@ function renderInsights() {
         {fmt: PCT1, ref: M.incPct, refLabel: 'conjunto ' + PCT1(M.incPct), title: '% de días con marcación impar por área (top 6)'}); });
   } else if (M.incPct !== null) add('good', 'Marcación completa en ' + b(pctS(100 - M.incPct)) + ' de los días presentes.', null,
       'Regla: marcación completa meta ' + fmt(mC[0], 0) + ' %.',
-      function () { return miniShare([{label: 'completa', v: A.pres - A.inc, color: cssv('--good')}, {label: 'incompleta', v: A.inc, color: cssv('--s2')}], {title: 'Días presentes según marcación'}); });
+      function () { return miniShare([{label: 'completa', v: A.pres - A.inc, color: cssv('--s1')}, {label: 'incompleta', v: A.inc, color: cssv('--s2')}], {title: 'Días presentes según marcación'}); });
   /* 4b. salidas anticipadas */
   if (M.salAnt !== null && A.jorVal > 50) {
     var ws = deps.slice().filter(function (i) { return A.byDep[i].jorVal > 20; })
@@ -2293,10 +2518,35 @@ function renderInsights() {
       'Regla: informativo. Toda marcación en día no laborable del perfil (fin de semana o feriado) se cuenta como hora extra; en día hábil, el exceso sobre las horas estimadas.',
       function () { return miniBars(topDeps(deps, function (i) { return (A.byDep[i].extraNoLab + A.byDep[i].sobre) / 60; }, 6, wf), {fmt: function (v) { return fmt(v, 0) + ' h'; }, title: 'Horas extra por área (top 6)'}); });
   }
+  /* 7. feriados trabajados (v14) */
+  if (A.ferDias > 0) {
+    var fk = Object.keys(A.fer).sort(function (x, y) { return A.fer[y].pres - A.fer[x].pres; })[0];
+    var fsec = Object.keys(A.fer[fk].secs).sort(function (x, y) { return A.fer[fk].secs[y] - A.fer[fk].secs[x]; })[0];
+    add('info', b(fmt(A.ferDias) + ' jornadas') + ' se trabajaron en feriado (' + b(fmt(A.minExtraFer / 60, 0) + ' h') +
+      '); la mayor fue el ' + dLong(A.fer[fk].d) + ' con ' + b(fmt(A.fer[fk].pres) + ' personas') + (fsec ? ', sobre todo de ' + fsec : '') + '.',
+      'Toda esa carga es hora extra por definición, más ' + fmt(A.minExtraFds / 60, 0) + ' h de fines de semana.',
+      'Regla: informativo. El calendario de feriados se edita en Configuración; cualquier marcación en esos días entra como hora extra.',
+      function () { return miniBars(Object.keys(A.fer).sort(function (x, y) { return A.fer[y].pres - A.fer[x].pres; }).slice(0, 6)
+        .map(function (k) { return {label: k.slice(8, 10) + '/' + k.slice(5, 7), v: A.fer[k].pres, hl: k === fk}; }),
+        {fmt: function (v) { return fmt(v, 0); }, title: 'Personas por feriado trabajado (top 6)'}); });
+  }
+  /* 8. vacaciones y licencias (v14) */
+  if (A.vac + A.lic > 0) {
+    var kv = Object.keys(A.byMes).sort(), pkm = kv.slice().sort(function (x, y) {
+      return (A.byMes[y].vac + A.byMes[y].vacN) - (A.byMes[x].vac + A.byMes[x].vacN); })[0];
+    add('info', b(fmt(A.vac) + ' días de vacación') + ' en ' + b(fmt(Object.keys(A.vacEmps).length) + ' personas') +
+      ' y ' + b(fmt(A.lic) + ' días de licencia') + ' (' + fmt(A.licT.BM || 0) + ' de baja médica). El mes de mayor salida fue ' +
+      MESES[+pkm.slice(5, 7) - 1] + '.',
+      'Representan ' + pct(A.vac + A.lic, A.prog + A.vac + A.lic, 1) + ' del calendario del periodo y no cuentan como ausentismo.',
+      'Regla: informativo. V y VDN son vacación; BM, LR, LDM y LPM son licencia. Un día cuenta una vez por persona.',
+      function () { return miniCols(kv.map(function (k) { return A.byMes[k].vac + A.byMes[k].vacN + A.byMes[k].licBM + A.byMes[k].licOt; }),
+        {labels: kv.map(function (k) { return MESES[+k.slice(5, 7) - 1]; }), title: 'Días de vacación y licencia por mes', lo: 0}); });
+  }
   var plot = card(host, {noTable: true, title: 'Hallazgos del periodo', sub: 'Lectura automática de los datos filtrados: qué está bien, qué preocupa y dónde actuar. Cada hallazgo indica la regla que lo dispara y muestra la evidencia en un gráfico resumen.'});
-  var ul = document.createElement('ul'); ul.className = 'ins' + (out.length >= 5 ? ' three' : '');
+  var ul = document.createElement('ul'); ul.className = 'ins' + (Math.min(out.length, {gerencia: 4, rrhh: 6, planta: 5}[VIEW] || 9) >= 5 ? ' three' : '');
   out.sort(function (x, y) { var o = {crit: 0, warn: 1, info: 2, good: 3}; return o[x.sev] - o[y.sev]; });
-  out.slice(0, 8).forEach(function (it) {
+  var LIM = {gerencia: 4, rrhh: 6, planta: 5}[VIEW] || 9;
+  out.slice(0, LIM).forEach(function (it) {
     var li = document.createElement('li'); li.className = it.sev;
     var ic = document.createElement('span'); ic.className = 'ic'; ic.innerHTML = ICO[it.sev === 'info' ? 'good' : it.sev];
     if (it.sev === 'info') ic.innerHTML = '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.3 7h1.4v4.6H7.3zm0-2.6h1.4v1.4H7.3z" fill="currentColor"/></svg>';
@@ -2416,7 +2666,7 @@ function renderSecciones() {
     plot.appendChild(w);
   }
   if (cardOn('cSeccKpi')) {
-    var S1 = cssv('--s1'), S2 = cssv('--s2'), S3 = cssv('--serious');
+    var S1 = cssv('--s1'), S2 = cssv('--s2'), S3 = cssv('--s3');
     var idx = secs.slice().sort(function (a, b) { return (A.bySec[b].falta / A.bySec[b].prog) - (A.bySec[a].falta / A.bySec[a].prog); });
     var aus = idx.map(function (k) { var S = A.bySec[k]; return S.prog ? 100 * S.falta / S.prog : 0; });
     var atr = idx.map(function (k) { var S = A.bySec[k]; var t = S.atr + S.punt; return t ? 100 * S.atr / t : 0; });
@@ -2431,16 +2681,19 @@ function renderSecciones() {
     else p2.appendChild(txt('Sin datos en el rango.'));
   }
   if (cardOn('cSeccHoras')) {
-    var C1 = cssv('--s1'), C2 = cssv('--s2');
+    var C1 = cssv('--s1'), C2 = cssv('--s2'), C3 = cssv('--s3');
     var idx2 = secs.slice().sort(function (a, b) { return (A.bySec[b].extraNoLab + A.bySec[b].sobre) - (A.bySec[a].extraNoLab + A.bySec[a].sobre); });
-    var fds = idx2.map(function (k) { return A.bySec[k].extraNoLab / 60; }), sob = idx2.map(function (k) { return A.bySec[k].sobre / 60; });
-    var p3 = card(el('cSeccHoras'), {title: 'Horas extra por sección', sub: 'Horas en fin de semana y feriados más exceso sobre la jornada en día hábil. Valores absolutos del periodo.', clickHint: HINT_SEC,
-      legend: [{color: C1, label: 'Fin de semana y feriados'}, {color: C2, label: 'Exceso en día hábil'}],
-      table: function () { return mkTable([{t: 'Sección'}, {t: 'Fin de semana', n: 1}, {t: 'Exceso día hábil', n: 1}, {t: 'Total', n: 1}, {t: 'Por persona', n: 1}],
-        idx2.map(function (k, i) { var S = A.bySec[k]; return [k, fmt(fds[i], 0) + ' h', fmt(sob[i], 0) + ' h', fmt(fds[i] + sob[i], 0) + ' h', S.empsEnd ? fmt((fds[i] + sob[i]) / S.empsEnd, 1) + ' h' : '—']; })); }});
-    if (idx2.length) barChart(p3, {rows: idx2, labelW: 118, stacked: true, rowH: rp(34, 32, 30), yfmt: function (v) { return fmt(v, 0); }, vfmt: function (v) { return fmt(v, 0) + ' h'; },
+    var fds = idx2.map(function (k) { return A.bySec[k].extraFds / 60; }),
+        fer = idx2.map(function (k) { return A.bySec[k].extraFer / 60; }),
+        sob = idx2.map(function (k) { return A.bySec[k].sobre / 60; });
+    var p3 = card(el('cSeccHoras'), {title: 'Horas extra por sección y origen', sub: 'Fin de semana, feriado y exceso sobre la jornada en día hábil. Valores absolutos del periodo.', clickHint: HINT_SEC,
+      legend: [{color: C1, label: 'Fin de semana'}, {color: C2, label: 'Feriado'}, {color: C3, label: 'Exceso en día hábil'}],
+      table: function () { return mkTable([{t: 'Sección'}, {t: 'Fin de semana', n: 1}, {t: 'Feriado', n: 1}, {t: 'Exceso día hábil', n: 1}, {t: 'Total', n: 1}, {t: 'Por persona', n: 1}],
+        idx2.map(function (k, i) { var S = A.bySec[k], tt = fds[i] + fer[i] + sob[i];
+          return [k, fmt(fds[i], 0) + ' h', fmt(fer[i], 0) + ' h', fmt(sob[i], 0) + ' h', fmt(tt, 0) + ' h', S.empsEnd ? fmt(tt / S.empsEnd, 1) + ' h' : '—']; })); }});
+    if (idx2.length) barChart(p3, {rows: idx2, labelW: 118, stacked: true, rowH: rp(36, 34, 32), yfmt: function (v) { return fmt(v, 0); }, vfmt: function (v) { return fmt(v, 0) + ' h'; },
       onClick: function (k) { xfSeccion(idx2[k]); },
-      series: [{label: 'Fin de semana y feriados', color: C1, data: fds}, {label: 'Exceso en día hábil', color: C2, data: sob}]});
+      series: [{label: 'Fin de semana', color: C1, data: fds}, {label: 'Feriado', color: C2, data: fer, dark: true}, {label: 'Exceso en día hábil', color: C3, data: sob}]});
     else p3.appendChild(txt('Sin datos en el rango.'));
   }
 }
@@ -2691,6 +2944,104 @@ function renderDepKpi() {
     series: [{label: '% ausentismo', color: S1, data: aus}, {label: '% atrasos', color: S2, data: atr}]});
 }
 
+/* ------------------- vacaciones, licencias y feriados (v14) ------------- */
+function renderVacMes() {
+  var host = el('cVacMes'); if (!cardOn('cVacMes')) return;
+  var keys = Object.keys(A.byMes).sort();
+  var lab = keys.map(function (k) { return MESES[+k.slice(5, 7) - 1]; });
+  var vac = keys.map(function (k) { return A.byMes[k].vac + A.byMes[k].vacN; });
+  var bm  = keys.map(function (k) { return A.byMes[k].licBM; });
+  var ot  = keys.map(function (k) { return A.byMes[k].licOt; });
+  var C1 = cssv('--s1'), C2 = cssv('--s2'), C3 = cssv('--s3');
+  var tot = A.vac + A.lic;
+  var plot = card(host, {title: 'Vacaciones y licencias por mes',
+    sub: fmt(A.vac) + ' días de vacación (' + fmt(A.vacT.V || 0) + ' V · ' + fmt(A.vacT.VDN || 0) + ' VDN) y ' +
+      fmt(A.lic) + ' de licencia · ' + fmt(Object.keys(A.vacEmps).length) + ' personas tomaron vacación en el periodo.',
+    clickHint: HINT_T,
+    legend: [{color: C1, label: 'Vacación (V + VDN)'}, {color: C2, label: 'Baja médica (BM)'}, {color: C3, label: 'Otras licencias (LR · LDM · LPM)'}],
+    note: 'Un día cuenta una vez por persona. Los días de vacación y licencia no entran en el ausentismo: no son falta.',
+    table: function () { return mkTable([{t: 'Mes'}, {t: 'Vacación', n: 1}, {t: 'De ellas VDN', n: 1}, {t: 'Baja médica', n: 1}, {t: 'Otras licencias', n: 1}, {t: 'Total', n: 1}],
+      keys.map(function (k, i) { return [lab[i] + ' ' + k.slice(0, 4), fmt(vac[i]), fmt(A.byMes[k].vacN), fmt(bm[i]), fmt(ot[i]), fmt(vac[i] + bm[i] + ot[i])]; }),
+      ['Total', fmt(A.vac), fmt(A.vacT.VDN || 0), fmt(A.licT.BM || 0), fmt(A.lic - (A.licT.BM || 0)), fmt(tot)]); }});
+  if (!keys.length) { plot.appendChild(txt('Sin datos en el rango.')); return; }
+  colChart(plot, {cats: lab, stacked: true, h: rp(220, 235, 250), labelTop: true,
+    yfmt: function (v) { return fmt(v, 0); }, vfmt: function (v) { return fmt(v, 0) + ' días'; },
+    series: [{label: 'Vacación', color: C1, data: vac, dark: true}, {label: 'Baja médica', color: C2, data: bm, dark: true},
+             {label: 'Otras licencias', color: C3, data: ot}],
+    onClick: function (i) { xfMes(keys[i]); },
+    catLong: function (i) { return lab[i] + ' ' + keys[i].slice(0, 4); }});
+}
+function renderVacSec() {
+  var host = el('cVacSec'); if (!cardOn('cVacSec')) return;
+  var secs = seccionesEnAlcance();
+  var S = secs.map(function (x) { return A.bySec[x] || {vac: 0, lic: 0, prog: 0, emps: 0}; });
+  var C1 = cssv('--s1'), C2 = cssv('--s2');
+  var plot = card(host, {title: 'Vacaciones y licencias por sección',
+    sub: 'Días del periodo. La tasa compara esos días contra los días laborables programados de la sección.',
+    clickHint: HINT_SEC,
+    legend: [{color: C1, label: 'Vacación'}, {color: C2, label: 'Licencia'}],
+    table: function () { return mkTable([{t: 'Sección'}, {t: 'Personas', n: 1}, {t: 'Vacación', n: 1}, {t: 'Licencia', n: 1}, {t: '% sobre programado', n: 1}],
+      secs.map(function (x, i) { return [x, fmt(S[i].emps), fmt(S[i].vac), fmt(S[i].lic), pct(S[i].vac + S[i].lic, S[i].prog, 1)]; })); }});
+  if (!secs.length) { plot.appendChild(txt('Sin datos en el rango.')); return; }
+  barChart(plot, {rows: secs, stacked: true, labelW: 118, rowH: rp(38, 34, 32),
+    vfmt: function (v) { return fmt(v, 0) + ' días'; },
+    onClick: function (k) { xfSeccion(secs[k]); },
+    rowLong: function (k) { return secs[k] + ' · ' + fmt(S[k].emps) + ' personas'; },
+    series: [{label: 'Vacación', color: C1, data: S.map(function (x) { return x.vac; }), dark: true},
+             {label: 'Licencia', color: C2, data: S.map(function (x) { return x.lic; }), dark: true}]});
+}
+function renderExtraMes() {
+  var host = el('cExtraMes'); if (!cardOn('cExtraMes')) return;
+  var keys = Object.keys(A.byMes).sort();
+  var lab = keys.map(function (k) { return MESES[+k.slice(5, 7) - 1]; });
+  var fds = keys.map(function (k) { return A.byMes[k].extraFds / 60; });
+  var fer = keys.map(function (k) { return A.byMes[k].extraFer / 60; });
+  var sob = keys.map(function (k) { return A.byMes[k].sobre / 60; });
+  var C1 = cssv('--s1'), C2 = cssv('--s2'), C3 = cssv('--s3');
+  var M = metricas(A);
+  var plot = card(host, {title: 'Horas extra por mes y origen',
+    sub: fmt(M.hExtra, 0) + ' h en el periodo: ' + fmt(M.hFinde, 0) + ' h de fin de semana, ' + fmt(M.hFer, 0) +
+      ' h en feriado y ' + fmt(M.hSobre, 0) + ' h de exceso sobre la jornada en día hábil.',
+    clickHint: HINT_T,
+    legend: [{color: C1, label: 'Fin de semana'}, {color: C2, label: 'Feriado'}, {color: C3, label: 'Exceso en día hábil'}],
+    note: 'Fin de semana y feriado: toda la jornada es extra porque el día no es laborable para ese perfil. Exceso en día hábil: minutos por encima de la jornada objetivo.',
+    table: function () { return mkTable([{t: 'Mes'}, {t: 'Fin de semana (h)', n: 1}, {t: 'Feriado (h)', n: 1}, {t: 'Exceso día hábil (h)', n: 1}, {t: 'Total (h)', n: 1}],
+      keys.map(function (k, i) { return [lab[i] + ' ' + k.slice(0, 4), fmt(fds[i], 0), fmt(fer[i], 0), fmt(sob[i], 0), fmt(fds[i] + fer[i] + sob[i], 0)]; }),
+      ['Total', fmt(M.hFinde, 0), fmt(M.hFer, 0), fmt(M.hSobre, 0), fmt(M.hExtra, 0)]); }});
+  if (!keys.length) { plot.appendChild(txt('Sin datos en el rango.')); return; }
+  colChart(plot, {cats: lab, stacked: true, h: rp(220, 235, 250), labelTop: true,
+    yfmt: function (v) { return fmt(v, 0); }, vfmt: function (v) { return fmt(v, 0) + ' h'; },
+    series: [{label: 'Fin de semana', color: C1, data: fds, dark: true}, {label: 'Feriado', color: C2, data: fer, dark: true},
+             {label: 'Exceso en día hábil', color: C3, data: sob, dark: true}],
+    onClick: function (i) { xfMes(keys[i]); },
+    catLong: function (i) { return lab[i] + ' ' + keys[i].slice(0, 4); }});
+}
+function renderFer() {
+  var host = el('cFer'); if (!cardOn('cFer')) return;
+  var keys = Object.keys(A.fer).sort();
+  var lab = keys.map(function (k) { return k.slice(8, 10) + '/' + k.slice(5, 7); });
+  var pers = keys.map(function (k) { return A.fer[k].pres; });
+  var hrs = keys.map(function (k) { return A.fer[k].min / 60; });
+  var C1 = cssv('--s2');
+  var secDe = function (k) {
+    var o = A.fer[k].secs, ks = Object.keys(o).sort(function (a, b) { return o[b] - o[a]; });
+    return ks.slice(0, 3).map(function (x) { return x + ' (' + o[x] + ')'; }).join(' · ') || '—';
+  };
+  var plot = card(host, {title: 'Feriados trabajados',
+    sub: keys.length ? fmt(A.ferDias) + ' jornadas en ' + keys.length + ' feriados · ' + fmt(A.minExtraFer / 60, 0) + ' h, todas hora extra por definición.'
+      : 'Ningún feriado del calendario tuvo marcaciones en este rango.',
+    clickHint: HINT_T,
+    table: function () { return mkTable([{t: 'Feriado'}, {t: 'Personas', n: 1}, {t: 'Horas', n: 1}, {t: 'Promedio por persona', n: 1}, {t: 'Áreas con más gente'}],
+      keys.map(function (k, i) { return [dLong(A.fer[k].d), fmt(pers[i]), fmt(hrs[i], 0), fmt(hrs[i] / pers[i], 1) + ' h', secDe(k)]; }),
+      ['Total', fmt(A.ferDias), fmt(A.minExtraFer / 60, 0), '', '']); }});
+  if (!keys.length) { plot.appendChild(txt('Sin marcaciones en feriados dentro del rango.')); return; }
+  barChart(plot, {rows: lab, labelW: 78, rowH: rp(30, 28, 26),
+    vfmt: function (v) { return fmt(v, 0) + ' personas'; },
+    rowLong: function (k) { return dLong(A.fer[keys[k]].d) + ' · ' + fmt(hrs[k], 0) + ' h · ' + secDe(keys[k]); },
+    onClick: function (k) { xfRange(A.fer[keys[k]].d, A.fer[keys[k]].d); },
+    series: [{label: 'Personas que marcaron', color: C1, dark: true, data: pers}]});
+}
+
 /* --------------------------------------------------- rankings y detalle */
 function renderRankings() {
   if (cardOn('cRank')) {
@@ -2760,6 +3111,66 @@ function renderDetalle() {
   pg.appendChild(prev); pg.appendChild(next); pg.appendChild(txt('Página ' + (DETPAGE + 1) + ' de ' + fmt(pages)));
   plot.appendChild(pg);
 }
+/* ------------------------------------------- descargas (v14) */
+var DL_Q = null;
+function dlCap() {                 /* en claude.ai la descarga pasa por la capacidad «downloads» */
+  if (DL_Q) return DL_Q;
+  DL_Q = (window.claude && typeof claude.use === 'function')
+    ? claude.use('downloads').catch(function () { return null; })
+    : Promise.resolve(null);
+  return DL_Q;
+}
+function bajarAncla(nombre, blob) {
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+function bajarCsv(nombre, filas) {
+  var blob = new Blob(['\ufeff' + filas.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  dlCap().then(function (d) {
+    if (d && d.save) {
+      d.save({filename: nombre, data: blob}).catch(function (e) {
+        if (!e || e.code !== 'declined') bajarAncla(nombre, blob);
+      });
+    } else bajarAncla(nombre, blob);
+  });
+}
+function rango() { return PKG.fechas[F.d0] + '_al_' + PKG.fechas[F.d1]; }
+function num(v, d) { return v === null || v === undefined || !isFinite(v) ? '' : fmt(v, d === undefined ? 1 : d).replace(/\./g, '').replace(',', ','); }
+function exportAreas() {
+  var out = ['Departamento;Seccion;Perfil;Personal;DiasProgramados;Presentes;Faltas;PctAsistencia;Atrasos;PctPuntualidad;' +
+             'PctPermanencia;SalidaAnticipada;PctMarcacionCompleta;DiasVacacion;DiasLicencia;HorasFinDeSemana;HorasFeriado;HorasExcesoDiaHabil;JornadasEnFeriado'];
+  PKG.deptos.forEach(function (dn, i) {
+    var b = A.byDep[i]; if (!b.prog && !b.vac && !b.lic) return;
+    out.push([dn, seccionDe(i), nomPerfil(grupoDe(i)), b.emps, b.prog, b.pres, b.falta,
+      num(safePct(b.pres, b.prog)), b.atr, num(safePct(b.punt, b.punt + b.atr)),
+      num(safePct(b.jorOk, b.jorVal)), b.salAnt, num(safePct(b.presT - b.inc, b.presT)),
+      b.vac, b.lic, num(b.extraFds / 60, 0), num(b.extraFer / 60, 0), num(b.sobre / 60, 0), b.ferDias].join(';'));
+  });
+  bajarCsv('resumen_por_area_' + rango() + '.csv', out);
+}
+function exportMes() {
+  var ks = Object.keys(A.byMes).sort();
+  var out = ['Mes;DiasProgramados;Presentes;Faltas;PctAsistencia;Atrasos;Puntuales;PctPuntualidad;Vacacion;VacacionNavidad;BajaMedica;OtrasLicencias;HorasTrabajadas;HorasFinDeSemana;HorasFeriado;HorasExcesoDiaHabil;JornadasEnFeriado'];
+  ks.forEach(function (k) {
+    var m = A.byMes[k];
+    out.push([k, m.prog, m.pres, m.falta, num(safePct(m.pres, m.prog)), m.atr, m.punt, num(safePct(m.punt, m.punt + m.atr)),
+      m.vac, m.vacN, m.licBM, m.licOt, num(m.min / 60, 0), num(m.extraFds / 60, 0), num(m.extraFer / 60, 0), num(m.sobre / 60, 0), m.ferDias].join(';'));
+  });
+  bajarCsv('serie_mensual_' + rango() + '.csv', out);
+}
+function exportFeriados() {
+  var ks = Object.keys(A.fer).sort();
+  var out = ['Feriado;DiaSemana;Personas;Horas;PromedioHorasPorPersona;SeccionesConMasGente'];
+  ks.forEach(function (k) {
+    var f = A.fer[k], sec = Object.keys(f.secs).sort(function (x, y) { return f.secs[y] - f.secs[x]; })
+      .map(function (x) { return x + ' (' + f.secs[x] + ')'; }).join(' / ');
+    out.push([k, DIAS[DOW[f.d]], f.pres, num(f.min / 60, 0), num(f.min / 60 / f.pres, 1), sec].join(';'));
+  });
+  out.push(['TOTAL', '', A.ferDias, num(A.minExtraFer / 60, 0), '', ''].join(';'));
+  out.push(['Fines de semana (jornadas / horas)', '', A.fdsDias, num(A.minExtraFds / 60, 0), '', ''].join(';'));
+  bajarCsv('feriados_trabajados_' + rango() + '.csv', out);
+}
 function exportDetalle(rows) {
   var JOR = ['', 'Menos', 'Cumple', 'Mas'], EN = ['Presente', 'Falta', 'Vacacion', 'Licencia', 'No laborable'];
   var out = ['Fecha;CI;Empleado;Departamento;Seccion;Perfil;Turno;Estado;Ingreso;Salida;Marcaciones;MinutosTrabajados;MinutosAtraso;MinutosSalidaAnticipada;Jornada;MinutosExtra;Codigo'];
@@ -2768,10 +3179,7 @@ function exportDetalle(rows) {
     out.push([PKG.fechas[R.di[i]], e.ci, e.n, depName(e.d), seccionDe(e.d), nomPerfil(grupoDe(e.d)), D.est[i] === EST.PRES ? turnoText(i) : '', EN[D.est[i]], hhmm(D.ent[i]), hhmm(D.sal[i]),
       marksText(i).replace(/\s+/g, ' '), D.est[i] === EST.PRES ? D.trab[i] : '', D.atr[i] > 0 ? D.atr[i] : '', D.santi[i] > 0 ? D.santi[i] : '', JOR[D.jor[i]], D.extra[i] || '', codeText(i)].join(';'));
   }
-  var blob = new Blob(['﻿' + out.join('\r\n')], {type: 'text/csv;charset=utf-8'});
-  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'detalle_asistencia_' + PKG.fechas[F.d0] + '_al_' + PKG.fechas[F.d1] + '.csv';
-  document.body.appendChild(a); a.click(); a.remove();
+  bajarCsv('detalle_asistencia_' + PKG.fechas[F.d0] + '_al_' + PKG.fechas[F.d1] + '.csv', out);
 }
 function renderQa() {
   var host = el('cQa'); if (!cardOn('cQa')) return;
@@ -3434,8 +3842,7 @@ function syncFilterUI() {
 var FOPEN = false;
 function syncFiltros() {
   var w = el('fwrap');
-  if (!isNarrow()) { w.hidden = false; }
-  else { w.hidden = !FOPEN; }
+  w.hidden = !FOPEN;                 /* v14: barra de contexto también en escritorio */
   el('btnFiltros').setAttribute('aria-expanded', String(FOPEN));
 }
 function resumenFiltros() {
@@ -3499,7 +3906,6 @@ function resetCfg() {
   el('cfgMsg').textContent = 'Valores restablecidos a los detectados en el archivo.';
 }
 function render() {
-  if (!PKG) return;                 /* aún no hay datos cargados */
   saveCfg();
   A = aggregate();
   var pr = prevRange();
@@ -3523,6 +3929,10 @@ function render() {
   renderHeat();
   renderDep();
   renderDepKpi();
+  renderVacMes();
+  renderVacSec();
+  renderExtraMes();
+  renderFer();
   renderRankings();
   DETPAGE = 0;
   renderDetalle();
@@ -3544,11 +3954,12 @@ function boot(pkg) {
   el('fRango').value = 'all';
   setRange('all');
   DEPS_BEFORE_PLANTA = undefined;
-  var v0 = VIEW; VIEW = 'gerencia'; setView(v0 === 'planta' ? 'planta' : v0, true);
+  var hv = (location.hash || '').replace('#', '');          /* enlace directo a una vista */
+  var v0 = VIEWS[hv] ? hv : VIEW; VIEW = 'gerencia'; setView(v0, true);
   syncFiltros();
   el('hdrSub').textContent = 'Plásticos Carmen S.R.L. · ' + fmt(pkg.emp.length) + ' empleados · ' +
     pkg.meta.desde + ' al ' + pkg.meta.hasta + ' · ' + fmt(pkg.fechas.length) + ' días';
-  el('foot').textContent = 'Tablero de Control de Asistencia v13 · Plásticos Carmen S.R.L. · datos: ' +
+  el('foot').textContent = 'Tablero de Control de Asistencia v14 · Plásticos Carmen S.R.L. · datos: ' +
     pkg.meta.origen + ' · preparado ' + (pkg.meta.generado || '').replace('T', ' ') + ' · configuración guardada en este navegador';
   render();
 }
@@ -3638,11 +4049,31 @@ function wire() {
   });
   el('btnFiltros').addEventListener('click', function () { FOPEN = !FOPEN; syncFiltros(); });
   el('btnPrint').addEventListener('click', function () { window.print(); });
+  var dlm = el('dlMenu');
+  el('btnDl').addEventListener('click', function (ev) {
+    ev.stopPropagation(); dlm.hidden = !dlm.hidden; el('btnDl').setAttribute('aria-expanded', String(!dlm.hidden));
+  });
+  document.addEventListener('click', function () { dlm.hidden = true; el('btnDl').setAttribute('aria-expanded', 'false'); });
+  dlm.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-dl]'); if (!b) return;
+    dlm.hidden = true; el('btnDl').setAttribute('aria-expanded', 'false');
+    if (!PKG) { alert('Primero carga el CSV del Control de Asistencia.'); return; }
+    var k = b.getAttribute('data-dl');
+    if (k === 'areas') exportAreas();
+    else if (k === 'mes') exportMes();
+    else if (k === 'fer') exportFeriados();
+    else if (k === 'det') exportDetalle(A.detail);
+    else window.print();
+  });
   el('btnCsv').addEventListener('click', function () { el('fileCsv').click(); });
   el('fileCsv').addEventListener('change', function () {
-    var f = this.files && this.files[0];
-    this.value = '';
-    if (f) leerArchivo(f);
+    var f = this.files && this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try { boot(parseWideCsv(String(rd.result))); }
+      catch (err) { alert('No se pudo leer el archivo: ' + err.message); }
+    };
+    rd.readAsText(f, 'utf-8');
   });
   /* El teclado virtual dispara «resize» en móvil sin cambiar el ancho:
      solo se vuelve a dibujar si el ancho cambió de forma significativa. */
@@ -3659,141 +4090,34 @@ function wire() {
   window.addEventListener('orientationchange', function () { lastW = -1; onResize(); });
 }
 
-/* ------------------------------------------------------- datos locales
-   Publicación pública: el HTML no lleva datos. El CSV que carga cada
-   usuario se guarda en IndexedDB de su propio navegador (con respaldo en
-   localStorage si IndexedDB no está disponible) y nunca sale del equipo. */
-var DB_NAME = 'pc-asistencia', DB_STORE = 'datos', DB_KEY = 'csv-v13';
-var LS_KEY = 'pc-asistencia-datos-v13';
-function idbOpen() {
-  return new Promise(function (res, rej) {
-    if (!window.indexedDB) { rej(new Error('sin indexedDB')); return; }
-    var rq = indexedDB.open(DB_NAME, 1);
-    rq.onupgradeneeded = function () { var db = rq.result; if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE); };
-    rq.onsuccess = function () { res(rq.result); };
-    rq.onerror = function () { rej(rq.error || new Error('indexedDB')); };
-  });
-}
-function idbTx(modo, fn) {
-  return idbOpen().then(function (db) {
-    return new Promise(function (res, rej) {
-      var rq = fn(db.transaction(DB_STORE, modo).objectStore(DB_STORE));
-      rq.onsuccess = function () { res(rq.result); };
-      rq.onerror = function () { rej(rq.error || new Error('indexedDB')); };
-    });
-  });
-}
-function leerDatos() {
-  return idbTx('readonly', function (st) { return st.get(DB_KEY); })
-    .catch(function () { return null; })
-    .then(function (v) {
-      if (v && v.csv) return v;
-      try { var raw = localStorage.getItem(LS_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
-      return null;
-    });
-}
-function guardarDatos(reg) {
-  return idbTx('readwrite', function (st) { return st.put(reg, DB_KEY); })
-    .catch(function () {
-      try { localStorage.setItem(LS_KEY, JSON.stringify(reg)); } catch (e) {}
-    });
-}
-function borrarDatos() {
-  try { localStorage.removeItem(LS_KEY); } catch (e) {}
-  return idbTx('readwrite', function (st) { return st.delete(DB_KEY); }).catch(function () {});
-}
-
-/* ------------------------------------------------- pantalla de carga */
-function mostrarGate(on) {
-  el('gate').hidden = !on;
-  document.body.style.overflow = on ? 'hidden' : '';
-  if (on) {
-    el('hdrSub').textContent = 'Plásticos Carmen S.R.L. — sin datos cargados';
-    el('foot').textContent = 'Tablero de Control de Asistencia v13 · Plásticos Carmen S.R.L. · los datos y la configuración se guardan sólo en este navegador';
-  }
-}
-function gateError(msg) {
-  var e = el('gerr');
-  if (!msg) { e.hidden = true; e.textContent = ''; return; }
-  e.hidden = false; e.textContent = msg;
-}
-/* origen mostrado en el pie: nombre del archivo y cuándo se cargó */
-function marcarOrigen(pkg, nombre, cuando) {
-  pkg.meta = pkg.meta || {};
-  if (nombre) pkg.meta.origen = 'Control de Asistencia — ' + nombre;
-  if (cuando) pkg.meta.generado = cuando;
-  return pkg;
-}
-function usarCsv(texto, nombre, cuando, persistir) {
-  var pkg = parseWideCsv(texto);
-  if (!pkg || !pkg.emp || !pkg.emp.length) throw new Error('el archivo no contiene empleados');
-  if (!pkg.fechas || !pkg.fechas.length) throw new Error('el archivo no contiene columnas de fecha');
-  var ts = cuando || new Date().toISOString().slice(0, 19);
-  boot(marcarOrigen(pkg, nombre, ts));
-  mostrarGate(false);
-  gateError('');
-  if (persistir) guardarDatos({csv: texto, nombre: nombre || 'archivo.csv', guardado: ts});
-}
-function leerArchivo(f) {
-  if (!f) return;
-  if (!/\.csv$/i.test(f.name) && f.type && f.type.indexOf('csv') < 0 && f.type.indexOf('text') < 0) {
-    gateError('El archivo «' + f.name + '» no parece un CSV. Exporta el reporte del Control de Asistencia en formato CSV.');
-    return;
-  }
-  gateError(''); el('gbusy').hidden = false;
-  var rd = new FileReader();
-  rd.onload = function () {
-    setTimeout(function () {
-      try { usarCsv(String(rd.result), f.name, null, true); }
-      catch (err) { gateError('No se pudo leer el archivo: ' + err.message); mostrarGate(true); }
-      el('gbusy').hidden = true;
-    }, 20);
-  };
-  rd.onerror = function () { el('gbusy').hidden = true; gateError('No se pudo abrir el archivo.'); };
-  rd.readAsText(f, 'utf-8');
-}
-function wireGate() {
-  var drop = el('gdrop');
-  drop.addEventListener('click', function () { el('fileCsv').click(); });
-  drop.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('fileCsv').click(); }
-  });
-  ['dragenter', 'dragover'].forEach(function (ev) {
-    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
-  });
-  ['dragleave', 'drop'].forEach(function (ev) {
-    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
-  });
-  drop.addEventListener('drop', function (e) {
-    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    leerArchivo(f);
-  });
-  el('cfgDatos').addEventListener('click', function () {
-    if (!window.confirm('Se quitarán del navegador el archivo cargado. La configuración de perfiles y metas se conserva. ¿Continuar?')) return;
-    borrarDatos().then(function () { location.reload(); });
-  });
-}
-
 /* ------------------------------------------------------------ arranque */
 (function () {
   aplicarTema(leerTema() === 'dark' ? 'dark' : 'light', false);
   wire();
-  wireGate();
-  function abrirGuardado() {
-    leerDatos().then(function (reg) {
-      if (reg && reg.csv) {
-        try { usarCsv(reg.csv, reg.nombre, reg.guardado, false); return; }
-        catch (e) { borrarDatos(); }
-      }
-      mostrarGate(true);
-    }).catch(function () { mostrarGate(true); });
-  }
+  function start(pkg) { boot(pkg); }
   if (API_URL) {
     fetch(API_URL, {credentials: 'same-origin'})
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function (t) { usarCsv(t, 'export del sistema', null, false); })
-      .catch(abrirGuardado);
-  } else abrirGuardado();
+      .then(function (t) { start(parseWideCsv(t)); })
+      .catch(function () { start(DATASET); });
+  } else if (DATASET) start(DATASET);
+  else mostrarVacio();
+  function mostrarVacio() {
+    var m = document.querySelector('main');
+    m.textContent = '';
+    var d = document.createElement('div'); d.className = 'vacio';
+    var h2 = document.createElement('h2'); h2.appendChild(txt('Carga el export del Control de Asistencia'));
+    var p1 = document.createElement('p'); p1.appendChild(txt('El tablero trabaja con el CSV ancho que exporta el sistema (CI, Nombre, Departamento y una columna por fecha, separado por «;»). El archivo se procesa en tu navegador: no se sube a ningún servidor.'));
+    var b = document.createElement('button'); b.className = 'bigbtn'; b.type = 'button';
+    b.appendChild(txt('Elegir archivo CSV'));
+    b.addEventListener('click', function () { el('fileCsv').click(); });
+    var p2 = document.createElement('p'); p2.style.fontSize = '12.5px'; p2.style.color = 'var(--muted)';
+    p2.appendChild(txt('Los perfiles de jornada, las metas y los feriados quedan guardados en este navegador (Configuración).'));
+    d.appendChild(h2); d.appendChild(p1); d.appendChild(b); d.appendChild(p2);
+    m.appendChild(d);
+    el('hdrSub').textContent = 'Plásticos Carmen S.R.L. · sin datos cargados';
+    document.querySelector('.filters').hidden = true;
+  }
 })();
 
 </script>
