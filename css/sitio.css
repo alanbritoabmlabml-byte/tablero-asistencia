@@ -1,0 +1,26 @@
+/* ==========================================================================
+   Sitio público de Sistemas y Tableros · Plásticos Carmen
+   Sólo las diferencias respecto del Portafolio de Reportes BI: marca.css,
+   base.css, menu.css y tema.css se usan tal cual, sin tocar una línea.
+   Va después de tema.css porque aquí sólo hay excepciones de esta página.
+   ========================================================================== */
+
+/* Tarjeta de tablero en panel ancho, como la tarjeta de Reportes BI del menú:
+   ilustración a la izquierda y texto a la derecha en escritorio. */
+.rejilla--panel{display:block}
+.rejilla--panel .tarjeta--destacada{grid-column:auto;width:100%}
+
+@media (min-width:900px){
+  .rejilla--panel .tarjeta{
+    display:grid;
+    grid-template-columns:minmax(0,380px) minmax(0,1fr);
+    grid-template-areas:"franja franja" "vista cuerpo" "vista acciones";
+    align-items:start;
+  }
+  .rejilla--panel .tarjeta-franja{grid-area:franja}
+  /* Las ilustraciones son 320x150 con recorte: se respeta esa proporción
+     para que no se corten los bordes del dibujo. */
+  .rejilla--panel .tarjeta-vista{grid-area:vista;align-self:start}
+  .rejilla--panel .tarjeta-cuerpo{grid-area:cuerpo}
+  .rejilla--panel .tarjeta-acciones{grid-area:acciones;align-self:start}
+}
